@@ -104,6 +104,7 @@
       <div class="legend-item"><div class="legend-box" style="background:var(--amber)"></div>At risk</div>
       <div class="legend-item"><div class="legend-box" style="background:var(--red)"></div>Overdue</div>
       <div class="legend-item"><div class="legend-box" style="background:var(--purple)"></div>CA</div>
+      <div class="legend-item"><div class="legend-box" style="background:#4A4A4A"></div>On hold</div>
       <div class="legend-item"><div class="legend-line"></div>Today</div>
       <div class="legend-item"><div class="legend-flag"></div>Deadline</div>
     </div>
@@ -126,6 +127,7 @@
         <option value="atrisk">At risk</option>
         <option value="overdue">Overdue</option>
         <option value="ca">CA</option>
+        <option value="onhold">On hold</option>
       </select>
     </div>
     <div class="modal-actions">
@@ -143,8 +145,8 @@ const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_
 const TOKEN_KEY='arete_gh_token';
 const today=new Date();today.setHours(0,0,0,0);
 const LABEL_W=220;
-const SC={ontrack:'#3B6D11',atrisk:'#BA7517',overdue:'#A32D2D',ca:'#6B3FA0'};
-const ST={ontrack:'#C0DD97',atrisk:'#FAC775',overdue:'#F7C1C1',ca:'#D9C5F5'};
+const SC={ontrack:'#3B6D11',atrisk:'#BA7517',overdue:'#A32D2D',ca:'#6B3FA0',onhold:'#4A4A4A'};
+const ST={ontrack:'#C0DD97',atrisk:'#FAC775',overdue:'#F7C1C1',ca:'#D9C5F5',onhold:'#C8C8C8'};
 
 let token='',projects=[],nextId=1,fileSha='',editId=null;
 function ds(d){return d.toISOString().split('T')[0];}
