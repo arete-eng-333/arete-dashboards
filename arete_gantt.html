@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arete Engineering — Project Lookahead</title>
 <style>
-  :root{--bg:#ffffff;--bg2:#f5f5f2;--bg3:#eeede8;--text:#1a1a18;--text2:#6b6b66;--text3:#9b9b96;--border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);--radius:8px;--radius-lg:12px;--blue:#185FA5;--green:#3B6D11;--amber:#BA7517;--red:#A32D2D;--today:#E24B4A;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+  :root{--bg:#ffffff;--bg2:#f5f5f2;--bg3:#eeede8;--text:#1a1a18;--text2:#6b6b66;--text3:#9b9b96;--border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);--radius:8px;--radius-lg:12px;--blue:#185FA5;--green:#3B6D11;--amber:#BA7517;--red:#A32D2D;--purple:#6B3FA0;--today:#E24B4A;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
   @media(prefers-color-scheme:dark){:root{--bg:#1e1e1c;--bg2:#282825;--bg3:#323230;--text:#f0efea;--text2:#a0a09a;--text3:#6a6a64;--border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);}}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:100vh;}
@@ -13,7 +13,7 @@
   .topbar-title{font-size:16px;font-weight:500;}.topbar-sub{font-size:12px;color:var(--text2);margin-left:10px;}
   .topbar-right{display:flex;align-items:center;gap:10px;}
   .sync-badge{font-size:11px;color:var(--text3);padding:3px 8px;background:var(--bg2);border-radius:20px;border:0.5px solid var(--border);}
-  .page{max-width:1040px;margin:0 auto;padding:1.5rem;}
+  .page{width:100%;padding:1.5rem 2rem;}
   .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px;}
   .toolbar-left{display:flex;align-items:center;gap:10px;}
   .toolbar label{font-size:13px;color:var(--text2);}
@@ -26,8 +26,10 @@
   .gantt-header{display:flex;background:var(--bg2);border-bottom:0.5px solid var(--border);}
   .g-label{flex-shrink:0;font-size:12px;color:var(--text2);font-weight:500;padding:8px 12px;border-right:0.5px solid var(--border);}
   .date-strip{flex:1;display:flex;overflow:hidden;}
-  .date-cell{flex:1;font-size:11px;color:var(--text3);text-align:center;padding:6px 4px;border-right:0.5px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .date-cell{flex:1;font-size:10px;color:var(--text3);text-align:center;padding:6px 2px;border-right:0.5px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .date-cell:last-child{border-right:none;}
+  .date-cell.weekend{background:rgba(0,0,0,0.03);}
+  @media(prefers-color-scheme:dark){.date-cell.weekend{background:rgba(255,255,255,0.03);}}
   .gantt-row{display:flex;align-items:center;border-bottom:0.5px solid var(--border);min-height:46px;cursor:pointer;transition:background 0.1s;}
   .gantt-row:last-child{border-bottom:none;}.gantt-row:hover{background:var(--bg2);}
   .row-info{flex-shrink:0;padding:8px 12px;border-right:0.5px solid var(--border);display:flex;flex-direction:column;gap:2px;overflow:hidden;}
@@ -74,7 +76,7 @@
     </div>
     <button class="btn primary" style="width:100%;padding:8px;" id="connect-btn" onclick="doConnect()">Connect</button>
     <div class="err" id="setup-err"></div>
-    <div class="setup-note">Connects to the <strong>arete-dashboards</strong> repository on GitHub.<br>Your token is stored only in your browser session — never on disk.</div>
+    <div class="setup-note">Connects to the <strong>arete-dashboards</strong> repository on GitHub.<br>Your token is stored in your browser for convenience.</div>
   </div>
 </div>
 
@@ -87,16 +89,21 @@
     <div class="toolbar">
       <div class="toolbar-left">
         <label>Lookahead:</label>
-        <select id="lookahead"><option value="7">1 week</option><option value="14">2 weeks</option><option value="30" selected>1 month</option><option value="60">2 months</option></select>
+        <select id="lookahead">
+          <option value="7">1 week</option>
+          <option value="14">2 weeks</option>
+          <option value="30" selected>1 month</option>
+          <option value="60">2 months</option>
+        </select>
       </div>
       <button class="btn primary" onclick="openAdd()">+ Add project</button>
     </div>
     <div class="gantt-wrap" id="gantt"></div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-box" style="background:var(--blue)"></div>Active</div>
       <div class="legend-item"><div class="legend-box" style="background:var(--green)"></div>On track</div>
       <div class="legend-item"><div class="legend-box" style="background:var(--amber)"></div>At risk</div>
       <div class="legend-item"><div class="legend-box" style="background:var(--red)"></div>Overdue</div>
+      <div class="legend-item"><div class="legend-box" style="background:var(--purple)"></div>CA</div>
       <div class="legend-item"><div class="legend-line"></div>Today</div>
       <div class="legend-item"><div class="legend-flag"></div>Deadline</div>
     </div>
@@ -107,14 +114,19 @@
 <div class="modal-bg" id="modal-bg" onclick="handleOverlay(event)">
   <div class="modal">
     <h3 id="modal-title">Add project</h3>
-    <div class="field"><label>Project name</label><input id="f-name" type="text" placeholder="e.g. Samsung Tool Install"/></div>
+    <div class="field"><label>Project name</label><input id="f-name" type="text" placeholder="e.g. 25408-Samsung UPW"/></div>
     <div class="field"><label>Assignee</label>
       <select id="f-assignee"><option value="">— unassigned —</option><option>Alex</option><option>Aubrey</option><option>Brett</option><option>Cassandra</option><option>Daniel</option><option>Kelly</option><option>Taylor</option><option>Timothy</option><option>Victoria</option></select>
     </div>
     <div class="field"><label>Start date</label><input id="f-start" type="date"/></div>
     <div class="field"><label>End / deadline date</label><input id="f-end" type="date"/></div>
     <div class="field"><label>Status</label>
-      <select id="f-status"><option value="active">Active</option><option value="ontrack">On track</option><option value="atrisk">At risk</option><option value="overdue">Overdue</option></select>
+      <select id="f-status">
+        <option value="ontrack">On track</option>
+        <option value="atrisk">At risk</option>
+        <option value="overdue">Overdue</option>
+        <option value="ca">CA</option>
+      </select>
     </div>
     <div class="modal-actions">
       <button class="btn danger" id="btn-delete" onclick="deleteProject()" style="display:none">Delete</button>
@@ -130,12 +142,22 @@ const GH_OWNER='arete-eng-333',GH_REPO='arete-dashboards',GH_FILE='data/gantt_da
 const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
 const TOKEN_KEY='arete_gh_token';
 const today=new Date();today.setHours(0,0,0,0);
-const LABEL_W=210;
-const SC={active:'#185FA5',ontrack:'#3B6D11',atrisk:'#BA7517',overdue:'#A32D2D'};
-const ST={active:'#B5D4F4',ontrack:'#C0DD97',atrisk:'#FAC775',overdue:'#F7C1C1'};
+const LABEL_W=220;
+const SC={ontrack:'#3B6D11',atrisk:'#BA7517',overdue:'#A32D2D',ca:'#6B3FA0'};
+const ST={ontrack:'#C0DD97',atrisk:'#FAC775',overdue:'#F7C1C1',ca:'#D9C5F5'};
+
 let token='',projects=[],nextId=1,fileSha='',editId=null;
 function ds(d){return d.toISOString().split('T')[0];}
 function pd(s){const[y,m,dy]=s.split('-').map(Number);return new Date(y,m-1,dy);}
+
+function sortProjects(arr){
+  return [...arr].sort((a,b)=>{
+    const na=parseInt(a.name.match(/^(\d+)/)?.[1]??'99999');
+    const nb=parseInt(b.name.match(/^(\d+)/)?.[1]??'99999');
+    if(na!==nb)return na-nb;
+    return a.name.localeCompare(b.name);
+  });
+}
 
 async function doConnect(){
   const t=document.getElementById('setup-token').value.trim();
@@ -150,7 +172,8 @@ async function doConnect(){
 function doDisconnect(){
   localStorage.removeItem(TOKEN_KEY);token='';projects=[];nextId=1;fileSha='';
   document.getElementById('app').style.display='none';document.getElementById('setup-screen').style.display='flex';
-  document.getElementById('setup-token').value='';document.getElementById('connect-btn').disabled=false;document.getElementById('connect-btn').textContent='Connect';showErr('');
+  document.getElementById('setup-token').value='';document.getElementById('connect-btn').disabled=false;
+  document.getElementById('connect-btn').textContent='Connect';showErr('');
 }
 function showErr(m){document.getElementById('setup-err').textContent=m;}
 
@@ -164,7 +187,8 @@ async function loadFromGitHub(){
     const meta=await r.json();fileSha=meta.sha;
     const content=JSON.parse(atob(meta.content.replace(/\n/g,'')));
     projects=content.projects||[];nextId=content.nextId||projects.length+1;
-    setBadge(`Synced ${new Date().toLocaleTimeString()}`);setLeft(`${projects.length} project${projects.length!==1?'s':''} loaded.`);
+    setBadge(`Synced ${new Date().toLocaleTimeString()}`);
+    setLeft(`${projects.length} project${projects.length!==1?'s':''} loaded.`);
     return true;
   }catch(e){showErr('Could not reach GitHub. Check your network.');setBadge('Error');return false;}
 }
@@ -188,36 +212,88 @@ function setRight(t){document.getElementById('right-status').textContent=t;}
 function render(){
   const days=parseInt(document.getElementById('lookahead').value);
   const windowEnd=new Date(today.getTime()+days*864e5),totalMs=days*864e5;
-  const colCount=days<=7?days:days<=14?7:days<=30?6:8,step=Math.ceil(days/colCount);
+  const step=days<=14?1:days<=30?2:4;
+  const colCount=Math.ceil(days/step);
   let dc='';
-  for(let i=0;i<=colCount;i++){const d=new Date(today.getTime()+i*step*864e5);if(d>windowEnd)break;dc+=`<div class="date-cell">${days<=14?d.toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'}):d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>`;}
+  for(let i=0;i<colCount;i++){
+    const d=new Date(today.getTime()+i*step*864e5);
+    if(d>windowEnd)break;
+    const isWeekend=d.getDay()===0||d.getDay()===6;
+    const label=days<=14
+      ?d.toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'})
+      :d.toLocaleDateString('en-US',{month:'numeric',day:'numeric'});
+    dc+=`<div class="date-cell${isWeekend?' weekend':''}">${label}</div>`;
+  }
   let html=`<div class="gantt-header"><div class="g-label" style="width:${LABEL_W}px">Project</div><div class="date-strip">${dc}</div></div>`;
-  const visible=projects.filter(p=>{const s=pd(p.start),e=pd(p.end);return s<=windowEnd&&e>=today;});
-  if(!visible.length){html+=`<div class="empty-state">No projects in this window. Add a project to get started.</div>`;}
-  else{visible.forEach(p=>{
-    const s=pd(p.start),e=pd(p.end),cs=s<today?today:s,ce=e>windowEnd?windowEnd:e;
-    const lp=Math.max(0,(cs-today)/totalMs*100),wp=Math.max(0.4,(ce-cs)/totalMs*100),dp=Math.min(100,(e-today)/totalMs*100),sd=e>=today&&e<=windowEnd;
-    html+=`<div class="gantt-row" onclick="openEdit(${p.id})"><div class="row-info" style="width:${LABEL_W}px"><span class="row-name">${p.name}</span><span class="row-sub">${p.assignee||''}</span></div><div class="bar-area"><div class="today-line"></div><div class="bar" style="left:${lp.toFixed(2)}%;width:${wp.toFixed(2)}%;background:${SC[p.status]||'#185FA5'};color:${ST[p.status]||'#B5D4F4'}">${p.name}</div>${sd?`<div class="deadline-marker" style="left:calc(${dp.toFixed(2)}% - 2px)" title="Deadline: ${p.end}"></div>`:''}</div></div>`;
-  });}
+  const sorted=sortProjects(projects);
+  const visible=sorted.filter(p=>{const s=pd(p.start),e=pd(p.end);return s<=windowEnd&&e>=today;});
+  if(!visible.length){
+    html+=`<div class="empty-state">No projects in this window. Add a project to get started.</div>`;
+  } else {
+    visible.forEach(p=>{
+      const s=pd(p.start),e=pd(p.end),cs=s<today?today:s,ce=e>windowEnd?windowEnd:e;
+      const lp=Math.max(0,(cs-today)/totalMs*100);
+      const wp=Math.max(0.3,(ce-cs)/totalMs*100);
+      const dp=Math.min(100,(e-today)/totalMs*100);
+      const sd=e>=today&&e<=windowEnd;
+      const color=SC[p.status]||'#3B6D11';
+      const tcolor=ST[p.status]||'#C0DD97';
+      html+=`<div class="gantt-row" onclick="openEdit(${p.id})">
+        <div class="row-info" style="width:${LABEL_W}px"><span class="row-name">${p.name}</span><span class="row-sub">${p.assignee||''}</span></div>
+        <div class="bar-area">
+          <div class="today-line"></div>
+          <div class="bar" style="left:${lp.toFixed(2)}%;width:${wp.toFixed(2)}%;background:${color};color:${tcolor}">${p.name}</div>
+          ${sd?`<div class="deadline-marker" style="left:calc(${dp.toFixed(2)}% - 2px)" title="Deadline: ${p.end}"></div>`:''}
+        </div>
+      </div>`;
+    });
+  }
   document.getElementById('gantt').innerHTML=html;
 }
 
-function openAdd(){editId=null;document.getElementById('modal-title').textContent='Add project';document.getElementById('f-name').value='';document.getElementById('f-assignee').value='';document.getElementById('f-start').value=ds(today);document.getElementById('f-end').value='';document.getElementById('f-status').value='active';document.getElementById('btn-delete').style.display='none';document.getElementById('modal-bg').classList.add('open');setTimeout(()=>document.getElementById('f-name').focus(),50);}
-function openEdit(id){editId=id;const p=projects.find(x=>x.id===id);if(!p)return;document.getElementById('modal-title').textContent='Edit project';document.getElementById('f-name').value=p.name;document.getElementById('f-assignee').value=p.assignee||'';document.getElementById('f-start').value=p.start;document.getElementById('f-end').value=p.end;document.getElementById('f-status').value=p.status;document.getElementById('btn-delete').style.display='block';document.getElementById('modal-bg').classList.add('open');}
+function openAdd(){
+  editId=null;
+  document.getElementById('modal-title').textContent='Add project';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-assignee').value='';
+  document.getElementById('f-start').value=ds(today);
+  document.getElementById('f-end').value='';
+  document.getElementById('f-status').value='ontrack';
+  document.getElementById('btn-delete').style.display='none';
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(),50);
+}
+function openEdit(id){
+  editId=id;const p=projects.find(x=>x.id===id);if(!p)return;
+  document.getElementById('modal-title').textContent='Edit project';
+  document.getElementById('f-name').value=p.name;
+  document.getElementById('f-assignee').value=p.assignee||'';
+  document.getElementById('f-start').value=p.start;
+  document.getElementById('f-end').value=p.end;
+  document.getElementById('f-status').value=p.status;
+  document.getElementById('btn-delete').style.display='block';
+  document.getElementById('modal-bg').classList.add('open');
+}
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 function handleOverlay(e){if(e.target===document.getElementById('modal-bg'))closeModal();}
 
 async function saveProject(){
-  const name=document.getElementById('f-name').value.trim(),assignee=document.getElementById('f-assignee').value,start=document.getElementById('f-start').value,end=document.getElementById('f-end').value,status=document.getElementById('f-status').value;
+  const name=document.getElementById('f-name').value.trim();
+  const assignee=document.getElementById('f-assignee').value;
+  const start=document.getElementById('f-start').value;
+  const end=document.getElementById('f-end').value;
+  const status=document.getElementById('f-status').value;
   if(!name||!start||!end){alert('Please fill in name, start, and end date.');return;}
   if(editId){const i=projects.findIndex(x=>x.id===editId);if(i>-1)projects[i]={...projects[i],name,assignee,start,end,status};}
   else{projects.push({id:nextId++,name,assignee,start,end,status});}
-  closeModal();render();await pushToGitHub(editId?`Update: ${name}`:`Add: ${name}`);
+  closeModal();render();
+  await pushToGitHub(editId?`Update: ${name}`:`Add: ${name}`);
 }
 async function deleteProject(){
   if(!editId)return;const p=projects.find(x=>x.id===editId);
   if(!confirm(`Delete "${p?.name}"?`))return;
-  projects=projects.filter(x=>x.id!==editId);closeModal();render();await pushToGitHub(`Delete: ${p?.name}`);
+  projects=projects.filter(x=>x.id!==editId);closeModal();render();
+  await pushToGitHub(`Delete: ${p?.name}`);
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
