@@ -46,7 +46,7 @@
       "assignee": "",
       "start": "2026-05-03",
       "end": "2026-05-29",
-      "status": "active"
+      "status": "ca"
     },
     {
       "id": 7,
@@ -66,5 +66,5 @@
     }
   ],
   "nextId": 9,
-  "updatedAt": "2026-05-03T21:07:19.482Z"
+  "updatedAt": "2026-05-03T21:07:23.576Z"
 }
