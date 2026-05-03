@@ -22,7 +22,7 @@
       "assignee": "Alex",
       "start": "2026-05-03",
       "end": "2026-05-13",
-      "status": "active"
+      "status": ""
     },
     {
       "id": 4,
@@ -66,5 +66,5 @@
     }
   ],
   "nextId": 9,
-  "updatedAt": "2026-05-03T21:07:54.037Z"
+  "updatedAt": "2026-05-03T21:08:10.977Z"
 }
