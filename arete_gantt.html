@@ -144,11 +144,11 @@ async function doConnect(){
   btn.disabled=true;btn.textContent='Connecting…';
   token=t;
   const ok=await loadFromGitHub();
-  if(ok){sessionStorage.setItem(TOKEN_KEY,token);document.getElementById('setup-screen').style.display='none';document.getElementById('app').style.display='block';render();}
+  if(ok){localStorage.setItem(TOKEN_KEY,token);document.getElementById('setup-screen').style.display='none';document.getElementById('app').style.display='block';render();}
   else{btn.disabled=false;btn.textContent='Connect';token='';}
 }
 function doDisconnect(){
-  sessionStorage.removeItem(TOKEN_KEY);token='';projects=[];nextId=1;fileSha='';
+  localStorage.removeItem(TOKEN_KEY);token='';projects=[];nextId=1;fileSha='';
   document.getElementById('app').style.display='none';document.getElementById('setup-screen').style.display='flex';
   document.getElementById('setup-token').value='';document.getElementById('connect-btn').disabled=false;document.getElementById('connect-btn').textContent='Connect';showErr('');
 }
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('lookahead').addEventListener('change',render);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
   document.getElementById('setup-token').addEventListener('keydown',e=>{if(e.key==='Enter')doConnect();});
-  const saved=sessionStorage.getItem(TOKEN_KEY);
+  const saved=localStorage.getItem(TOKEN_KEY);
   if(saved){token=saved;document.getElementById('setup-screen').style.display='none';document.getElementById('app').style.display='block';loadFromGitHub().then(ok=>{if(!ok)doDisconnect();else render();});}
 });
 </script>
