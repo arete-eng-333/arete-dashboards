@@ -1,5 +1,14 @@
 {
-  "projects": [],
-  "nextId": 1,
-  "updatedAt": "2026-05-03T19:59:32.973Z"
+  "projects": [
+    {
+      "id": 1,
+      "name": "26304-FatIce",
+      "assignee": "",
+      "start": "2026-05-03",
+      "end": "2026-05-04",
+      "status": "ontrack"
+    }
+  ],
+  "nextId": 2,
+  "updatedAt": "2026-05-03T20:13:16.000Z"
 }
