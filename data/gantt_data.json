@@ -47,8 +47,16 @@
       "start": "2026-05-03",
       "end": "2026-05-29",
       "status": "active"
+    },
+    {
+      "id": 7,
+      "name": "MR2 TU CA",
+      "assignee": "",
+      "start": "2026-05-03",
+      "end": "2026-05-23",
+      "status": "active"
     }
   ],
-  "nextId": 7,
-  "updatedAt": "2026-05-03T20:33:02.255Z"
+  "nextId": 8,
+  "updatedAt": "2026-05-03T20:33:27.210Z"
 }
