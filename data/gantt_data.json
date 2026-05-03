@@ -7,8 +7,16 @@
       "start": "2026-05-03",
       "end": "2026-05-04",
       "status": "ontrack"
+    },
+    {
+      "id": 2,
+      "name": "25309-BASF HWST",
+      "assignee": "",
+      "start": "2026-05-03",
+      "end": "2026-05-08",
+      "status": "active"
     }
   ],
-  "nextId": 2,
-  "updatedAt": "2026-05-03T20:13:16.000Z"
+  "nextId": 3,
+  "updatedAt": "2026-05-03T20:16:33.405Z"
 }
