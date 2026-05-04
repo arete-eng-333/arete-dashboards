@@ -58,11 +58,11 @@
     },
     {
       "id": 8,
-      "name": "26302-SAS Chem&Slurry-X",
+      "name": "26302-SAS F1 Slurry - 90%",
       "assignee": "Alex",
       "start": "2026-05-03",
-      "end": "2026-05-06",
-      "status": "onhold"
+      "end": "2026-05-14",
+      "status": "ontrack"
     },
     {
       "id": 9,
@@ -194,5 +194,5 @@
     }
   ],
   "nextId": 25,
-  "updatedAt": "2026-05-04T15:04:23.269Z"
+  "updatedAt": "2026-05-04T15:07:15.310Z"
 }
