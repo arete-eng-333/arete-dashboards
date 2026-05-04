@@ -74,7 +74,7 @@
     },
     {
       "id": 10,
-      "name": "25311-SAS TMAH Replacement - 50%",
+      "name": "25311-SAS TMAH Replacement (new install) - 50%",
       "assignee": "Alex",
       "start": "2026-05-03",
       "end": "2026-06-10",
@@ -178,5 +178,5 @@
     }
   ],
   "nextId": 23,
-  "updatedAt": "2026-05-04T14:22:46.293Z"
+  "updatedAt": "2026-05-04T14:23:07.263Z"
 }
