@@ -162,7 +162,7 @@
     },
     {
       "id": 21,
-      "name": "25304B-MR2 Headers (HVAC)",
+      "name": "25304B-MR2 Headers (HVAC) - IFC",
       "assignee": "Alex",
       "start": "2026-05-04",
       "end": "2026-05-15",
@@ -170,5 +170,5 @@
     }
   ],
   "nextId": 22,
-  "updatedAt": "2026-05-04T14:16:49.375Z"
+  "updatedAt": "2026-05-04T14:17:09.999Z"
 }
