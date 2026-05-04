@@ -199,8 +199,16 @@
       "start": "2026-05-04",
       "end": "2026-05-07",
       "status": "ontrack"
+    },
+    {
+      "id": 26,
+      "name": "25319-CAPA 14k GCS Demo - IFC (F226-SG01 & F226-SG02)",
+      "assignee": "Alex",
+      "start": "2026-02-05",
+      "end": "2026-05-29",
+      "status": "ca"
     }
   ],
-  "nextId": 26,
-  "updatedAt": "2026-05-04T18:59:36.730Z"
+  "nextId": 27,
+  "updatedAt": "2026-05-04T19:06:16.965Z"
 }
