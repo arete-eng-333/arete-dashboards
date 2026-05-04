@@ -131,12 +131,12 @@
     {
       "id": 17,
       "name": "26301-SAS CAPA 14k Install",
-      "assignee": "",
+      "assignee": "Alex",
       "start": "2026-05-03",
       "end": "2026-05-29",
       "status": "onhold"
     }
   ],
   "nextId": 18,
-  "updatedAt": "2026-05-04T02:14:37.486Z"
+  "updatedAt": "2026-05-04T02:14:46.089Z"
 }
