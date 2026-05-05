@@ -22,8 +22,9 @@
   .btn{font-family:var(--font);font-size:13px;padding:6px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg);color:var(--text);cursor:pointer;}
   .btn:hover{background:var(--bg2);}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue);}.btn.primary:hover{background:#0C447C;}
   .btn.danger{background:var(--red);color:#fff;border-color:var(--red);}.btn:disabled{opacity:0.5;cursor:not-allowed;}
-  .gantt-wrap{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
-  .gantt-header{display:flex;background:var(--bg2);border-bottom:0.5px solid var(--border);}
+  .gantt-wrap{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column;}
+  .gantt-body{overflow-y:auto;max-height:62vh;}
+  .gantt-header{display:flex;background:var(--bg2);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:10;flex-shrink:0;}
   .g-label{flex-shrink:0;font-size:12px;color:var(--text2);font-weight:500;padding:8px 12px;border-right:0.5px solid var(--border);}
   .date-strip{flex:1;display:flex;overflow:hidden;}
   .date-cell{flex:1;font-size:10px;color:var(--text3);text-align:center;padding:4px 2px;border-right:0.5px solid var(--border);overflow:hidden;line-height:1.4;}
@@ -228,7 +229,7 @@ function render(){
       :`${d.toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}<br>${dayName}`;
     dc+=`<div class="date-cell${isWeekend?' weekend':''}">${label}</div>`;
   }
-  let html=`<div class="gantt-header"><div class="g-label" style="width:${LABEL_W}px">Project</div><div class="date-strip">${dc}</div></div>`;
+  let html=`<div class="gantt-header"><div class="g-label" style="width:${LABEL_W}px">Project</div><div class="date-strip">${dc}</div></div><div class="gantt-body">`;
   const sorted=sortProjects(projects);
   const visible=sorted.filter(p=>{const s=pd(p.start),e=pd(p.end);return s<=windowEnd&&e>=today;});
   if(!visible.length){
@@ -252,7 +253,7 @@ function render(){
       </div>`;
     });
   }
-  document.getElementById('gantt').innerHTML=html;
+  html += '</div>'; document.getElementById('gantt').innerHTML=html;
 }
 
 function openAdd(){
