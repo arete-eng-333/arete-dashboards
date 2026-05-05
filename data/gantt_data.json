@@ -129,14 +129,6 @@
       "status": "onhold"
     },
     {
-      "id": 20,
-      "name": "25303-TEOS Install",
-      "assignee": "Alex",
-      "start": "2026-05-04",
-      "end": "2026-05-29",
-      "status": "ca"
-    },
-    {
       "id": 21,
       "name": "25304B-MR2 Headers (HVAC) - IFC",
       "assignee": "Alex",
@@ -186,5 +178,5 @@
     }
   ],
   "nextId": 27,
-  "updatedAt": "2026-05-05T19:06:49.395Z"
+  "updatedAt": "2026-05-05T19:06:57.902Z"
 }
