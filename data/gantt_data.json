@@ -105,14 +105,6 @@
       "status": "ca"
     },
     {
-      "id": 14,
-      "name": "25316-SAS ICPMS Ph1-Demo - IFC",
-      "assignee": "Alex",
-      "start": "2025-12-12",
-      "end": "2026-05-29",
-      "status": "onhold"
-    },
-    {
       "id": 15,
       "name": "25318-SAS CLNS TMAH Conversion",
       "assignee": "Alex",
@@ -210,5 +202,5 @@
     }
   ],
   "nextId": 27,
-  "updatedAt": "2026-05-05T19:04:35.484Z"
+  "updatedAt": "2026-05-05T19:05:58.900Z"
 }
