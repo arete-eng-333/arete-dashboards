@@ -129,14 +129,6 @@
       "status": "onhold"
     },
     {
-      "id": 19,
-      "name": "25301-SAS F2 TEOS Demo",
-      "assignee": "Alex",
-      "start": "2026-05-03",
-      "end": "2026-05-29",
-      "status": "ca"
-    },
-    {
       "id": 20,
       "name": "25303-TEOS Install",
       "assignee": "Alex",
@@ -194,5 +186,5 @@
     }
   ],
   "nextId": 27,
-  "updatedAt": "2026-05-05T19:06:42.590Z"
+  "updatedAt": "2026-05-05T19:06:49.395Z"
 }
