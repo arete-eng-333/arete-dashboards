@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arete Engineering — Resource Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #171b24;
+    --surface2: #1e2330;
+    --border: #2a3045;
+    --text: #e8eaf0;
+    --text-muted: #6b7490;
+    --text-dim: #3d4560;
+    --accent: #4f8ef7;
+    --accent2: #7c5cbf;
+    --green: #2ecc8a;
+    --green-bg: rgba(46,204,138,0.12);
+    --yellow: #f0c040;
+    --yellow-bg: rgba(240,192,64,0.12);
+    --red: #f05060;
+    --red-bg: rgba(240,80,96,0.12);
+    --empty: #1a1f2e;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .logo {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+  }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* BUTTONS */
+  .btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #3a7ae8; }
+  .btn-danger {
+    background: transparent;
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+  .btn-danger:hover { background: var(--red-bg); }
+  .btn-sm {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  /* MAIN LAYOUT */
+  main { padding: 24px 28px; }
+
+  /* WEEK CONTROLS */
+  .week-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .week-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+  .week-nav { display: flex; gap: 8px; align-items: center; }
+  .week-badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 5px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    gap: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* GRID */
+  .grid-wrap { overflow-x: auto; }
+  table.resource-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+  }
+  .resource-grid th {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .resource-grid th.week-th {
+    text-align: center;
+    min-width: 130px;
+  }
+  .resource-grid th.week-th .wk-num { color: var(--accent); font-size: 11px; }
+  .resource-grid th.week-th .wk-dates { color: var(--text-dim); font-size: 9px; margin-top: 2px; }
+
+  /* PERSON ROW */
+  tr.person-row td {
+    padding: 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  tr.person-row:last-child td { border-bottom: none; }
+
+  .person-cell {
+    padding: 10px 14px;
+    min-width: 160px;
+    border-right: 1px solid var(--border);
+  }
+  .person-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    font-family: var(--sans);
+  }
+  .person-role {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .person-cap {
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .person-target {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* HEAT CELL */
+  .heat-cell {
+    text-align: center;
+    padding: 6px 4px;
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+    transition: filter 0.12s;
+    position: relative;
+  }
+  .heat-cell:hover { filter: brightness(1.15); }
+  .heat-cell:last-child { border-right: none; }
+  .heat-cell.empty { background: var(--empty); }
+  .heat-cell.under { background: var(--yellow-bg); }
+  .heat-cell.on { background: var(--green-bg); }
+  .heat-cell.over { background: var(--red-bg); }
+
+  .cell-hours {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .heat-cell.empty .cell-hours { color: var(--text-dim); }
+  .heat-cell.under .cell-hours { color: var(--yellow); }
+  .heat-cell.on .cell-hours { color: var(--green); }
+  .heat-cell.over .cell-hours { color: var(--red); }
+
+  .cell-pct {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+  .heat-cell.empty .cell-pct { color: var(--text-dim); }
+  .heat-cell.under .cell-pct { color: var(--yellow); opacity: 0.7; }
+  .heat-cell.on .cell-pct { color: var(--green); opacity: 0.7; }
+  .heat-cell.over .cell-pct { color: var(--red); opacity: 0.7; }
+
+  .cell-add { font-size: 9px; color: var(--text-dim); margin-top: 2px; opacity: 0.5; }
+  .heat-cell:hover .cell-add { opacity: 1; color: var(--accent); }
+
+  /* TOTALS ROW */
+  tr.totals-row td {
+    padding: 10px 14px;
+    border-top: 2px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  tr.totals-row td:first-child { text-align: left; font-size: 10px; letter-spacing: 0.06em; }
+
+  /* PROJECTS PANEL */
+  .projects-panel {
+    margin-top: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 20px;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .panel-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+  .project-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .project-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+  }
+  .chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .chip-remove { cursor: pointer; color: var(--text-dim); font-size: 14px; line-height: 1; transition: color 0.12s; }
+  .chip-remove:hover { color: var(--red); }
+  .add-project-row { display: flex; gap: 8px; margin-top: 12px; }
+  .add-project-row input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 7px 12px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 11px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-project-row input:focus { border-color: var(--accent); }
+  .add-project-row input::placeholder { color: var(--text-dim); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 24px;
+  }
+  .modal-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .modal-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    margin-bottom: 20px;
+  }
+  .modal-sub span { color: var(--accent); }
+  .modal-cap {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .modal-cap strong { color: var(--text-muted); }
+  .assignment-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .assignment-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .assignment-row .proj-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .assignment-row .proj-name {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+  }
+  .assignment-row input[type=number] {
+    width: 64px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 5px 8px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    text-align: right;
+    outline: none;
+  }
+  .assignment-row input[type=number]:focus { border-color: var(--accent); }
+  .hrs-label { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+  .modal-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .modal-total.ok { background: var(--green-bg); border: 1px solid rgba(46,204,138,0.2); }
+  .modal-total.warn { background: var(--red-bg); border: 1px solid rgba(240,80,96,0.2); }
+  .modal-total .tot-label { color: var(--text-muted); }
+  .modal-total .tot-val { font-weight: 600; }
+  .modal-total.ok .tot-val { color: var(--green); }
+  .modal-total.warn .tot-val { color: var(--red); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* PRINT */
+  @media print {
+    body { background: #fff; color: #111; }
+    header { background: #f5f5f5; border-color: #ddd; }
+    .logo span, .accent { color: #2255cc; }
+    .header-actions, .week-nav .btn, .btn-ghost, .btn-primary, .projects-panel .add-project-row,
+    .chip-remove, .modal-overlay, .cell-add { display: none !important; }
+    main { padding: 12px; }
+    :root {
+      --bg: #fff;
+      --surface: #f9f9f9;
+      --surface2: #efefef;
+      --border: #d0d0d0;
+      --text: #111;
+      --text-muted: #555;
+      --text-dim: #999;
+      --green-bg: #e6f9f1;
+      --yellow-bg: #fef9e5;
+      --red-bg: #fdecea;
+      --empty: #f7f7f7;
+      --green: #1a9964;
+      --yellow: #b08010;
+      --red: #c02030;
+    }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ARETE<span>.</span>ENGINEERING &nbsp;/&nbsp; Resource Planner</div>
+  <div class="header-actions">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>ON TARGET</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>UNDER</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>OVER</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim)"></div>UNASSIGNED</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="printDashboard()">⎙ PRINT / PDF</button>
+  </div>
+</header>
+
+<main>
+  <div class="week-bar">
+    <div class="week-label">ROLLING 4-WEEK WINDOW &mdash; PLANNED ALLOCATION</div>
+    <div class="week-nav">
+      <button class="btn btn-ghost btn-sm" onclick="shiftWeeks(-1)">← PREV WEEK</button>
+      <div class="week-badge" id="windowLabel"></div>
+      <button class="btn btn-ghost btn-sm" onclick="shiftWeeks(1)">NEXT WEEK →</button>
+    </div>
+  </div>
+
+  <div class="grid-wrap">
+    <table class="resource-grid" id="resourceGrid">
+      <thead id="gridHead"></thead>
+      <tbody id="gridBody"></tbody>
+    </table>
+  </div>
+
+  <div class="projects-panel">
+    <div class="panel-header">
+      <div class="panel-title">ACTIVE PROJECTS</div>
+    </div>
+    <div class="project-chips" id="projectChips"></div>
+    <div class="add-project-row">
+      <input type="text" id="newProjectInput" placeholder="Add project number or name (e.g. 23317 — Komico)" maxlength="60" />
+      <button class="btn btn-ghost btn-sm" onclick="addProject()">+ ADD</button>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div class="modal-cap" id="modalCap"></div>
+    <div class="assignment-list" id="assignmentList"></div>
+    <div class="modal-total ok" id="modalTotal">
+      <span class="tot-label">TOTAL PLANNED</span>
+      <span class="tot-val" id="modalTotVal">0 hrs</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">CANCEL</button>
+      <button class="btn btn-primary" onclick="saveModal()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const STAFF = [
+  { id: 'luke',     name: 'Luke',     role: 'Principal Engineer',      target: 0.60, capacity: 36 },
+  { id: 'alex',     name: 'Alex',     role: 'Project Engineer',         target: 0.85, capacity: 34 },
+  { id: 'brett',    name: 'Brett',    role: 'Technical Project Coord.', target: 0.85, capacity: 34 },
+  { id: 'cassandra',name: 'Cassandra',role: 'Designer II',              target: 0.90, capacity: 36 },
+  { id: 'daniel',   name: 'Daniel',   role: 'Senior Designer',          target: 0.90, capacity: 36 },
+  { id: 'timothy',  name: 'Timothy',  role: 'Engineer in Training',     target: 0.90, capacity: 36 },
+  { id: 'victoria', name: 'Victoria', role: 'Project Coordinator',      target: 0.90, capacity: 36 },
+];
+
+// Weekly capacity = target * 40 hrs
+function weekCap(staff) { return Math.round(staff.target * 40); }
+
+const PROJECT_COLORS = [
+  '#4f8ef7','#7c5cbf','#2ecc8a','#f0c040','#f05060',
+  '#00b8d4','#ff7043','#ab47bc','#26a69a','#ec407a'
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+let state = loadState();
+
+function defaultState() {
+  const startWeek = currentWeekNum();
+  return {
+    startWeek,       // ISO week number of first column
+    startYear: new Date().getFullYear(),
+    projects: [],
+    // assignments[personId][weekKey][projectId] = hours
+    assignments: {}
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('arete_resource_v2');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  localStorage.setItem('arete_resource_v2', JSON.stringify(state));
+}
+
+// ─── WEEK UTILITIES ──────────────────────────────────────────────────────────
+
+function currentWeekNum() {
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
+
+function weekKey(year, week) { return `${year}-W${String(week).padStart(2,'0')}`; }
+
+function getWeekColumns() {
+  const cols = [];
+  let w = state.startWeek;
+  let y = state.startYear;
+  for (let i = 0; i < 4; i++) {
+    cols.push({ year: y, week: w, key: weekKey(y, w) });
+    w++;
+    if (w > weeksInYear(y)) { w = 1; y++; }
+  }
+  return cols;
+}
+
+function weeksInYear(y) {
+  const d = new Date(y, 11, 28);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
+
+function weekDates(year, week) {
+  const jan4 = new Date(year, 0, 4);
+  const start = new Date(jan4);
+  start.setDate(jan4.getDate() + (week - 1) * 7 - (jan4.getDay() + 6) % 7);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 4); // Mon-Fri
+  const fmt = d => `${d.getMonth()+1}/${d.getDate()}`;
+  return `${fmt(start)} – ${fmt(end)}`;
+}
+
+// ─── PROJECTS ────────────────────────────────────────────────────────────────
+
+function addProject() {
+  const input = document.getElementById('newProjectInput');
+  const name = input.value.trim();
+  if (!name) return;
+  const id = 'p' + Date.now();
+  const color = PROJECT_COLORS[state.projects.length % PROJECT_COLORS.length];
+  state.projects.push({ id, name, color });
+  input.value = '';
+  saveState();
+  renderProjects();
+  renderGrid();
+}
+
+function removeProject(id) {
+  state.projects = state.projects.filter(p => p.id !== id);
+  // Remove assignments for this project
+  for (const pid in state.assignments) {
+    for (const wk in state.assignments[pid]) {
+      delete state.assignments[pid][wk][id];
+    }
+  }
+  saveState();
+  renderProjects();
+  renderGrid();
+}
+
+function renderProjects() {
+  const container = document.getElementById('projectChips');
+  container.innerHTML = '';
+  state.projects.forEach(p => {
+    const chip = document.createElement('div');
+    chip.className = 'project-chip';
+    chip.innerHTML = `
+      <div class="chip-dot" style="background:${p.color}"></div>
+      <span>${p.name}</span>
+      <span class="chip-remove" onclick="removeProject('${p.id}')" title="Remove project">&times;</span>
+    `;
+    container.appendChild(chip);
+  });
+}
+
+// ─── WEEK NAV ────────────────────────────────────────────────────────────────
+
+function shiftWeeks(delta) {
+  state.startWeek += delta;
+  const max = weeksInYear(state.startYear);
+  if (state.startWeek > max) { state.startWeek -= max; state.startYear++; }
+  if (state.startWeek < 1) { state.startYear--; state.startWeek += weeksInYear(state.startYear); }
+  saveState();
+  renderGrid();
+}
+
+// ─── GRID ────────────────────────────────────────────────────────────────────
+
+function getPersonWeekHours(personId, weekKey) {
+  const wkData = state.assignments?.[personId]?.[weekKey] || {};
+  return Object.values(wkData).reduce((a, b) => a + (Number(b) || 0), 0);
+}
+
+function heatClass(hours, cap) {
+  if (hours === 0) return 'empty';
+  const ratio = hours / cap;
+  if (ratio > 1.0) return 'over';
+  if (ratio >= 0.75) return 'on';
+  return 'under';
+}
+
+function renderGrid() {
+  const cols = getWeekColumns();
+  const head = document.getElementById('gridHead');
+  const body = document.getElementById('gridBody');
+
+  // Window label
+  const first = cols[0], last = cols[3];
+  document.getElementById('windowLabel').textContent =
+    `WK ${first.week} – WK ${last.week} · ${first.year}`;
+
+  // Header
+  head.innerHTML = `<tr>
+    <th>EMPLOYEE</th>
+    ${cols.map(c => `
+      <th class="week-th">
+        <div class="wk-num">WK ${c.week}</div>
+        <div class="wk-dates">${weekDates(c.year, c.week)}</div>
+      </th>`).join('')}
+  </tr>`;
+
+  // Body
+  let rows = '';
+  STAFF.forEach(s => {
+    const cap = weekCap(s);
+    const cells = cols.map(c => {
+      const hrs = getPersonWeekHours(s.id, c.key);
+      const cls = heatClass(hrs, cap);
+      const pct = hrs > 0 ? Math.round(hrs / cap * 100) + '%' : '—';
+      return `
+        <td class="heat-cell ${cls}" onclick="openModal('${s.id}','${c.key}','${c.week}','${c.year}')">
+          <div class="cell-hours">${hrs > 0 ? hrs : '·'}</div>
+          <div class="cell-pct">${pct}</div>
+          <div class="cell-add">[edit]</div>
+        </td>`;
+    }).join('');
+
+    rows += `
+      <tr class="person-row">
+        <td class="person-cell">
+          <div class="person-name">${s.name}</div>
+          <div class="person-role">${s.role}</div>
+          <div class="person-cap">${cap} hrs/wk capacity</div>
+          <div class="person-target">TARGET ${Math.round(s.target*100)}%</div>
+        </td>
+        ${cells}
+      </tr>`;
+  });
+
+  // Totals row
+  const totals = cols.map(c => {
+    const total = STAFF.reduce((sum, s) => sum + getPersonWeekHours(s.id, c.key), 0);
+    return `<td>${total > 0 ? total + ' hrs' : '—'}</td>`;
+  }).join('');
+  rows += `<tr class="totals-row"><td>TEAM TOTAL</td>${totals}</tr>`;
+
+  body.innerHTML = rows;
+}
+
+// ─── MODAL ───────────────────────────────────────────────────────────────────
+
+let modalContext = null;
+
+function openModal(personId, wkKey, wkNum, wkYear) {
+  if (state.projects.length === 0) {
+    alert('Add at least one project before assigning hours.');
+    return;
+  }
+  const person = STAFF.find(s => s.id === personId);
+  modalContext = { personId, wkKey, wkNum, wkYear };
+
+  document.getElementById('modalTitle').textContent =
+    `${person.name.toUpperCase()} — WEEK ${wkNum}`;
+  document.getElementById('modalSub').innerHTML =
+    `${weekDates(Number(wkYear), Number(wkNum))} &nbsp;·&nbsp; <span>${person.role}</span>`;
+
+  const cap = weekCap(person);
+  document.getElementById('modalCap').innerHTML =
+    `Weekly capacity: <strong>${cap} hrs</strong> &nbsp;(${Math.round(person.target*100)}% of 40 hrs)`;
+
+  const existing = state.assignments?.[personId]?.[wkKey] || {};
+
+  const list = document.getElementById('assignmentList');
+  list.innerHTML = state.projects.map(p => `
+    <div class="assignment-row">
+      <div class="proj-dot" style="background:${p.color}"></div>
+      <div class="proj-name">${p.name}</div>
+      <input type="number" min="0" max="60" step="0.5"
+        id="inp_${p.id}"
+        value="${existing[p.id] || ''}"
+        placeholder="0"
+        oninput="updateModalTotal('${personId}')" />
+      <span class="hrs-label">hrs</span>
+    </div>`).join('');
+
+  updateModalTotal(personId);
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function updateModalTotal(personId) {
+  const person = STAFF.find(s => s.id === personId);
+  const cap = weekCap(person);
+  let total = 0;
+  state.projects.forEach(p => {
+    const inp = document.getElementById('inp_' + p.id);
+    if (inp) total += Number(inp.value) || 0;
+  });
+  const el = document.getElementById('modalTotal');
+  const val = document.getElementById('modalTotVal');
+  val.textContent = `${total} hrs / ${cap} hrs`;
+  el.className = 'modal-total ' + (total > cap ? 'warn' : 'ok');
+}
+
+function saveModal() {
+  if (!modalContext) return;
+  const { personId, wkKey } = modalContext;
+  if (!state.assignments[personId]) state.assignments[personId] = {};
+  if (!state.assignments[personId][wkKey]) state.assignments[personId][wkKey] = {};
+  state.projects.forEach(p => {
+    const inp = document.getElementById('inp_' + p.id);
+    const val = Number(inp?.value) || 0;
+    if (val > 0) state.assignments[personId][wkKey][p.id] = val;
+    else delete state.assignments[personId][wkKey][p.id];
+  });
+  saveState();
+  closeModal();
+  renderGrid();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  modalContext = null;
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+// ─── PRINT ───────────────────────────────────────────────────────────────────
+
+function printDashboard() {
+  window.print();
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+
+document.getElementById('newProjectInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addProject();
+});
+
+renderProjects();
+renderGrid();
+</script>
+</body>
+</html>
