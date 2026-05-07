@@ -95,6 +95,7 @@
           <option value="14">2 weeks</option>
           <option value="30" selected>1 month</option>
           <option value="60">2 months</option>
+          <option value="all">All</option>
         </select>
       </div>
       <button class="btn primary" onclick="openAdd()">+ Add project</button>
@@ -221,13 +222,16 @@ function setLeft(t){document.getElementById('left-status').textContent=t;}
 function setRight(t){document.getElementById('right-status').textContent=t;}
 
 function render(){
-  const days=parseInt(document.getElementById('lookahead').value);
+  const lookaheadVal=document.getElementById('lookahead').value;
+  const isAll=lookaheadVal==='all';
+  const days=isAll?3650:parseInt(lookaheadVal);
   const windowEnd=new Date(today.getTime()+days*864e5),totalMs=days*864e5;
-  const step=days<=14?1:days<=30?2:4;
-  const colCount=Math.ceil(days/step);
+  const viewStart=isAll?new Date(today.getTime()-3650*864e5):today;
+  const step=isAll?30:days<=14?1:days<=30?2:4;
+  const colCount=isAll?Math.ceil(days/step):Math.ceil(days/step);
   let dc='';
   for(let i=0;i<colCount;i++){
-    const d=new Date(today.getTime()+i*step*864e5);
+    const d=new Date(viewStart.getTime()+i*step*864e5);
     if(d>windowEnd)break;
     const dow=d.getDay();
     const isWeekend=dow===0||dow===6;
@@ -239,16 +243,16 @@ function render(){
   }
   let html=`<div class="gantt-header"><div class="g-label" style="width:${LABEL_W}px">Project</div><div class="date-strip">${dc}</div></div><div class="gantt-body">`;
   const sorted=sortProjects(projects);
-  const visible=sorted.filter(p=>{const s=pd(p.start),e=pd(p.end);return s<=windowEnd&&e>=today;});
+  const visible=sorted.filter(p=>{const s=pd(p.start),e=pd(p.end);return s<=windowEnd&&e>=viewStart;});
   if(!visible.length){
     html+=`<div class="empty-state">No projects in this window. Add a project to get started.</div>`;
   } else {
     visible.forEach(p=>{
-      const s=pd(p.start),e=pd(p.end),cs=s<today?today:s,ce=e>windowEnd?windowEnd:e;
-      const lp=Math.max(0,(cs-today)/totalMs*100);
+      const s=pd(p.start),e=pd(p.end),cs=s<viewStart?viewStart:s,ce=e>windowEnd?windowEnd:e;
+      const lp=Math.max(0,(cs-viewStart)/totalMs*100);
       const wp=Math.max(0.3,(ce-cs)/totalMs*100);
-      const dp=Math.min(100,(e-today)/totalMs*100);
-      const sd=e>=today&&e<=windowEnd;
+      const dp=Math.min(100,(e-viewStart)/totalMs*100);
+      const sd=e>=viewStart&&e<=windowEnd;
       const color=SC[p.status]||'#3B6D11';
       const tcolor=ST[p.status]||'#C0DD97';
       html+=`<div class="gantt-row" onclick="openEdit(${p.id})">
