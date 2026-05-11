@@ -66,7 +66,7 @@
     },
     {
       "id": 9,
-      "name": "25304A-Labs - N Lab - 90%",
+      "name": "25304A-Labs - N Lab - 60%",
       "assignee": "Victoria",
       "start": "2026-05-03",
       "end": "2026-05-11",
@@ -170,5 +170,5 @@
     }
   ],
   "nextId": 27,
-  "updatedAt": "2026-05-11T14:04:54.967Z"
+  "updatedAt": "2026-05-11T14:10:11.333Z"
 }
