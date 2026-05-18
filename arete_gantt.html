@@ -16,6 +16,10 @@
   .page{width:100%;padding:1.5rem 2rem;}
   .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px;}
   .toolbar-left{display:flex;align-items:center;gap:10px;}
+  .nav-btn{font-family:var(--font);font-size:16px;width:30px;height:30px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+  .nav-btn:hover{background:var(--bg2);}
+  .nav-reset{font-family:var(--font);font-size:11px;padding:4px 8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;}
+  .nav-reset:hover{background:var(--bg2);}
   .toolbar label{font-size:13px;color:var(--text2);}
   select,input{font-family:var(--font);font-size:13px;padding:6px 10px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg);color:var(--text);}
   select:focus,input:focus{outline:2px solid var(--blue);outline-offset:1px;}
@@ -97,6 +101,9 @@
           <option value="60">2 months</option>
           <option value="all">All</option>
         </select>
+        <button class="nav-btn" onclick="shiftWindow(-1)" title="Previous period">&#8592;</button>
+        <button class="nav-btn" onclick="shiftWindow(1)" title="Next period">&#8594;</button>
+        <button class="nav-reset" onclick="resetWindow()" id="reset-btn" style="display:none">Back to today</button>
       </div>
       <button class="btn primary" onclick="openAdd()">+ Add project</button>
     </div>
@@ -217,6 +224,18 @@ async function pushToGitHub(msg='Update project data'){
   }catch(e){setRight(`Save failed: ${e.message}`);}
 }
 
+let windowOffset=0;
+function shiftWindow(dir){
+  if(document.getElementById('lookahead').value==='all') return;
+  windowOffset+=dir;
+  document.getElementById('reset-btn').style.display=windowOffset!==0?'block':'none';
+  render();
+}
+function resetWindow(){
+  windowOffset=0;
+  document.getElementById('reset-btn').style.display='none';
+  render();
+}
 function setBadge(t){document.getElementById('sync-badge').textContent=t;}
 function setLeft(t){document.getElementById('left-status').textContent=t;}
 function setRight(t){document.getElementById('right-status').textContent=t;}
@@ -225,8 +244,10 @@ function render(){
   const lookaheadVal=document.getElementById('lookahead').value;
   const isAll=lookaheadVal==='all';
   const days=isAll?3650:parseInt(lookaheadVal);
-  const windowEnd=new Date(today.getTime()+days*864e5),totalMs=days*864e5;
-  const viewStart=isAll?new Date(today.getTime()-3650*864e5):today;
+  const offsetMs=isAll?0:windowOffset*days*864e5;
+  const viewStart=isAll?new Date(today.getTime()-3650*864e5):new Date(today.getTime()+offsetMs);
+  const windowEnd=new Date(viewStart.getTime()+days*864e5);
+  const totalMs=days*864e5;
   const step=isAll?30:days<=14?1:days<=30?2:4;
   const colCount=isAll?Math.ceil(days/step):Math.ceil(days/step);
   let dc='';
@@ -314,7 +335,11 @@ async function deleteProject(){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('lookahead').addEventListener('change',render);
+  document.getElementById('lookahead').addEventListener('change',()=>{
+    windowOffset=0;
+    document.getElementById('reset-btn').style.display='none';
+    render();
+  });
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
   document.getElementById('setup-token').addEventListener('keydown',e=>{if(e.key==='Enter')doConnect();});
   const saved=localStorage.getItem(TOKEN_KEY);
