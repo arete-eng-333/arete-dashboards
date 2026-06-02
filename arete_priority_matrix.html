@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arete Priority Matrix</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.12);
+    --border-strong: rgba(0,0,0,0.22);
+    --text-primary: #1a1a18;
+    --text-secondary: #6b6a66;
+    --text-tertiary: #a09f9a;
+    --blue-light: #E6F1FB;
+    --blue-text: #185FA5;
+    --green-light: #E1F5EE;
+    --green-text: #0F6E56;
+    --amber-light: #FAEEDA;
+    --amber-text: #854F0B;
+    --red-light: #FCEBEB;
+    --red-text: #A32D2D;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 20px 40px;
+  }
+
+  header {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .header-left h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .header-left p {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: 0.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    transition: background 0.12s, color 0.12s;
+  }
+  button:hover { background: #f0efeb; }
+
+  #add-btn {
+    background: var(--text-primary);
+    color: #fff;
+    border-color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #add-btn:hover { background: #333; }
+
+  #outer {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  #y-axis-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  #y-axis-label svg { flex-shrink: 0; }
+
+  #board {
+    position: relative;
+    flex: 1;
+    height: 580px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+    user-select: none;
+    background: var(--surface);
+  }
+
+  .quad {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+  }
+  .quad-tl { top: 0; left: 0; background: var(--green-light); border-radius: var(--radius) 0 0 0; }
+  .quad-tr { top: 0; right: 0; background: var(--blue-light); border-radius: 0 var(--radius) 0 0; }
+  .quad-bl { bottom: 0; left: 0; background: var(--red-light); border-radius: 0 0 0 var(--radius); }
+  .quad-br { bottom: 0; right: 0; background: var(--amber-light); border-radius: 0 0 var(--radius) 0; }
+
+  .mid-line {
+    position: absolute;
+    background: rgba(0,0,0,0.1);
+    pointer-events: none;
+  }
+
+  .quad-label {
+    position: absolute;
+    font-size: 11px;
+    font-weight: 600;
+    pointer-events: none;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.01em;
+  }
+
+  .x-axis-label {
+    position: absolute;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    pointer-events: none;
+    bottom: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .card {
+    position: absolute;
+    width: 156px;
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 9px 11px 8px;
+    cursor: grab;
+    transition: border-color 0.12s, box-shadow 0.12s;
+  }
+  .card:hover {
+    border-color: rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .card.dragging {
+    cursor: grabbing;
+    border-color: var(--blue-text);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    opacity: 0.94;
+    z-index: 1000;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-word;
+    margin-bottom: 3px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .card-notes {
+    font-size: 11px;
+    color: var(--text-secondary);
+    word-break: break-word;
+    line-height: 1.5;
+    max-height: 50px;
+    overflow: hidden;
+  }
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 7px;
+  }
+  .card-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 4px;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    line-height: 1;
+    border-radius: 4px;
+    transition: color 0.1s, background 0.1s;
+  }
+  .card-btn:hover { color: var(--text-primary); background: rgba(0,0,0,0.06); }
+
+  /* Modal */
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(2px);
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.open { display: flex; }
+  #modal {
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 22px 22px 18px;
+    width: 340px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  }
+  #modal h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+  #modal label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 5px;
+  }
+  #modal input, #modal textarea {
+    width: 100%;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--bg);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    display: block;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.12s;
+  }
+  #modal input:focus, #modal textarea:focus { border-color: var(--blue-text); }
+  #modal textarea { height: 80px; margin-top: 0; }
+  .modal-field { margin-bottom: 12px; }
+  #modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  #modal-actions button {
+    font-size: 13px;
+    padding: 7px 16px;
+  }
+  #modal-save {
+    background: var(--text-primary) !important;
+    color: #fff !important;
+    border-color: var(--text-primary) !important;
+  }
+  #modal-save:hover { background: #333 !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Priority Matrix</h1>
+    <p>Arete Engineering — drag cards to position</p>
+  </div>
+  <div class="toolbar">
+    <button id="clear-btn">Clear all</button>
+    <button id="add-btn">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Add card
+    </button>
+  </div>
+</header>
+
+<div id="outer">
+  <div id="y-axis-label">
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 9V1M1 5l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    higher priority &nbsp;&nbsp;&nbsp; lower priority
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  <div id="board">
+    <div class="quad quad-tl"></div>
+    <div class="quad quad-tr"></div>
+    <div class="quad quad-bl"></div>
+    <div class="quad quad-br"></div>
+
+    <div class="mid-line" style="left:50%; top:0; width:0.5px; height:100%;"></div>
+    <div class="mid-line" style="top:50%; left:0; width:100%; height:0.5px;"></div>
+
+    <div class="quad-label" style="top:11px; right:14px; text-align:right; color:var(--blue-text);">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 6l2 2 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      do it / own it
+    </div>
+    <div class="quad-label" style="top:11px; left:14px; color:var(--green-text);">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 5.5c0 1.657-1.343 3-3 3S2 7.157 2 5.5 3.343 2.5 5 2.5s3 1.343 3 3z" stroke="currentColor" stroke-width="1.3"/><path d="M10 9.5c0-1.105-1.343-2-3-2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      delegate it
+    </div>
+    <div class="quad-label" style="bottom:28px; right:14px; text-align:right; color:var(--amber-text);">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="2.5" width="9" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 5h9M4 1v3M8 1v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      schedule it
+    </div>
+    <div class="quad-label" style="bottom:28px; left:14px; color:var(--red-text);">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 3h8M5 3V2h2v1M4.5 3v6M7.5 3v6M3 3l.5 7h5L9 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      drop it
+    </div>
+
+    <div class="x-axis-label">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M9 5H1M5 1L1 5l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      less important &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; more important
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8M5 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal">
+    <h3 id="modal-title">Add card</h3>
+    <div class="modal-field">
+      <label for="modal-input-title">Title</label>
+      <input id="modal-input-title" type="text" placeholder="What needs to be done?" maxlength="60" />
+    </div>
+    <div class="modal-field">
+      <label for="modal-input-notes">Notes</label>
+      <textarea id="modal-input-notes" placeholder="Optional context or details…"></textarea>
+    </div>
+    <div id="modal-actions">
+      <button id="modal-cancel">Cancel</button>
+      <button id="modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'arete_priority_matrix_v1';
+const board = document.getElementById('board');
+let cards = [];
+let editingId = null;
+let dragState = null;
+
+function uid() { return Math.random().toString(36).slice(2, 9); }
+function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cards)); } catch(e) {} }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function load() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) cards = JSON.parse(raw); } catch(e) { cards = []; }
+  if (!cards.length) {
+    cards = [
+      { id: uid(), title: 'OKR4 — strategic shift', notes: 'Reduce direct project work to 60% utilization', x: 0.72, y: 0.12 },
+      { id: uid(), title: 'Team utilization tracking', notes: 'Monograph onboarding + dashboard', x: 0.68, y: 0.28 },
+      { id: uid(), title: 'Business development', notes: 'New client pipeline and outreach', x: 0.55, y: 0.55 },
+      { id: uid(), title: 'Sliderule roadmap', notes: 'Next phase of calculator toolkit', x: 0.38, y: 0.35 },
+    ];
+  }
+}
+
+function editIcon() {
+  return `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-6 6H3V8l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function trashIcon() {
+  return `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 4h9M5 4V3h3v1M4 4l.5 6.5h4L9 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function cardEl(c) {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.dataset.id = c.id;
+  el.innerHTML = `<div class="card-title">${escHtml(c.title)}</div>${c.notes ? `<div class="card-notes">${escHtml(c.notes)}</div>` : ''}<div class="card-actions"><button class="card-btn edit-btn" title="Edit">${editIcon()}</button><button class="card-btn del-btn" title="Delete">${trashIcon()}</button></div>`;
+  positionCard(el, c);
+
+  el.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.card-btn')) return;
+    e.preventDefault();
+    const cr = el.getBoundingClientRect();
+    dragState = { id: c.id, el, offX: e.clientX - cr.left, offY: e.clientY - cr.top };
+    el.classList.add('dragging');
+    el.style.zIndex = 500;
+  });
+
+  el.querySelector('.edit-btn').addEventListener('click', () => openModal(c.id));
+  el.querySelector('.del-btn').addEventListener('click', () => {
+    if (!confirm('Delete this card?')) return;
+    cards = cards.filter(x => x.id !== c.id);
+    el.remove();
+    save();
+  });
+  return el;
+}
+
+function positionCard(el, c) {
+  const bw = board.clientWidth || 860;
+  const bh = board.clientHeight || 580;
+  const cw = 156, ch = 95;
+  el.style.left = clamp(c.x * bw - cw / 2, 2, bw - cw - 2) + 'px';
+  el.style.top = clamp(c.y * bh - ch / 2, 2, bh - ch - 2) + 'px';
+}
+
+function render() {
+  board.querySelectorAll('.card').forEach(e => e.remove());
+  cards.forEach(c => board.appendChild(cardEl(c)));
+}
+
+document.addEventListener('mousemove', (e) => {
+  if (!dragState) return;
+  const br = board.getBoundingClientRect();
+  const bw = board.clientWidth;
+  const bh = board.clientHeight;
+  const cw = 156, ch = 95;
+  const px = clamp(e.clientX - br.left - dragState.offX, 2, bw - cw - 2);
+  const py = clamp(e.clientY - br.top - dragState.offY, 2, bh - ch - 2);
+  dragState.el.style.left = px + 'px';
+  dragState.el.style.top = py + 'px';
+  const c = cards.find(x => x.id === dragState.id);
+  if (c) { c.x = (px + cw / 2) / bw; c.y = (py + ch / 2) / bh; }
+});
+
+document.addEventListener('mouseup', () => {
+  if (!dragState) return;
+  dragState.el.classList.remove('dragging');
+  dragState.el.style.zIndex = '';
+  dragState = null;
+  save();
+});
+
+function openModal(id) {
+  editingId = id || null;
+  const c = id ? cards.find(x => x.id === id) : null;
+  document.getElementById('modal-title').textContent = id ? 'Edit card' : 'Add card';
+  document.getElementById('modal-input-title').value = c ? c.title : '';
+  document.getElementById('modal-input-notes').value = c ? c.notes : '';
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('modal-input-title').focus(), 50);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  editingId = null;
+}
+
+document.getElementById('add-btn').addEventListener('click', () => openModal(null));
+document.getElementById('modal-cancel').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', (e) => { if (e.target === document.getElementById('modal-overlay')) closeModal(); });
+
+document.getElementById('modal-save').addEventListener('click', () => {
+  const title = document.getElementById('modal-input-title').value.trim();
+  if (!title) { document.getElementById('modal-input-title').focus(); return; }
+  const notes = document.getElementById('modal-input-notes').value.trim();
+  if (editingId) {
+    const c = cards.find(x => x.id === editingId);
+    if (c) { c.title = title; c.notes = notes; }
+  } else {
+    cards.push({ id: uid(), title, notes, x: 0.48 + (Math.random() - 0.5) * 0.15, y: 0.48 + (Math.random() - 0.5) * 0.15 });
+  }
+  save(); render(); closeModal();
+});
+
+document.getElementById('modal-input-title').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('modal-save').click(); });
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  if (!confirm('Clear all cards? This cannot be undone.')) return;
+  cards = []; save(); render();
+});
+
+load();
+render();
+</script>
+</body>
+</html>
