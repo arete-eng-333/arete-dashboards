@@ -18,7 +18,7 @@
     },
     {
       "id": 5,
-      "name": "25407-E Specs - PVDF",
+      "name": "25407-E Specs",
       "assignee": "Luke",
       "start": "2026-05-03",
       "end": "2026-06-26",
@@ -146,5 +146,5 @@
     }
   ],
   "nextId": 27,
-  "updatedAt": "2026-06-02T19:21:25.019Z"
+  "updatedAt": "2026-06-02T19:21:35.275Z"
 }
