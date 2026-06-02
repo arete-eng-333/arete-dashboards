@@ -137,14 +137,6 @@
       "status": "ontrack"
     },
     {
-      "id": 23,
-      "name": "25409-Intel PF",
-      "assignee": "Brett",
-      "start": "2026-05-04",
-      "end": "2026-05-13",
-      "status": "ontrack"
-    },
-    {
       "id": 24,
       "name": "25307A-CDA & PVAC - IFC",
       "assignee": "Brett",
@@ -162,5 +154,5 @@
     }
   ],
   "nextId": 27,
-  "updatedAt": "2026-06-02T16:52:06.094Z"
+  "updatedAt": "2026-06-02T16:52:15.112Z"
 }
