@@ -1,14 +1,6 @@
 {
   "projects": [
     {
-      "id": 2,
-      "name": "25309-BASF HWST",
-      "assignee": "Victoria",
-      "start": "2026-05-03",
-      "end": "2026-05-12",
-      "status": ""
-    },
-    {
       "id": 3,
       "name": "25304D-MR2-FHSR - IFC",
       "assignee": "Alex",
@@ -154,5 +146,5 @@
     }
   ],
   "nextId": 27,
-  "updatedAt": "2026-06-02T17:06:05.806Z"
+  "updatedAt": "2026-06-02T17:06:16.220Z"
 }
