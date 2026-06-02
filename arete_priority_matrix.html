@@ -8,13 +8,13 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #f7f6f3;
-    --surface: #ffffff;
-    --border: rgba(0,0,0,0.12);
-    --border-strong: rgba(0,0,0,0.22);
-    --text-primary: #1a1a18;
-    --text-secondary: #6b6a66;
-    --text-tertiary: #a09f9a;
+    --bg: #2c2c2a;
+    --surface: #3a3a37;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.18);
+    --text-primary: #f0efeb;
+    --text-secondary: #b4b2a9;
+    --text-tertiary: #888780;
     --blue-light: #E6F1FB;
     --blue-text: #185FA5;
     --green-light: #E1F5EE;
@@ -29,7 +29,7 @@
 
   body {
     font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
-    background: var(--bg);
+    background: #2c2c2a;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -39,7 +39,7 @@
 
   header {
     width: 100%;
-    max-width: 900px;
+    max-width: 1100px;
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -76,7 +76,7 @@
     color: var(--text-secondary);
     transition: background 0.12s, color 0.12s;
   }
-  button:hover { background: #f0efeb; }
+  button:hover { background: #444441; }
 
   #add-btn {
     background: var(--text-primary);
@@ -86,14 +86,14 @@
     align-items: center;
     gap: 6px;
   }
-  #add-btn:hover { background: #333; }
+  #add-btn:hover { background: #555; }
 
   #outer {
     display: flex;
     align-items: stretch;
     gap: 0;
     width: 100%;
-    max-width: 900px;
+    max-width: 1100px;
   }
 
   #y-axis-label {
@@ -118,7 +118,7 @@
   #board {
     position: relative;
     flex: 1;
-    height: 580px;
+    height: 720px;
     border: 0.5px solid var(--border-strong);
     border-radius: var(--radius);
     overflow: hidden;
@@ -226,7 +226,7 @@
     border-radius: 4px;
     transition: color 0.1s, background 0.1s;
   }
-  .card-btn:hover { color: var(--text-primary); background: rgba(0,0,0,0.06); }
+  .card-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.08); }
 
   /* Modal */
   #modal-overlay {
@@ -269,7 +269,7 @@
     font-size: 13px;
     font-family: inherit;
     color: var(--text-primary);
-    background: var(--bg);
+    background: #2c2c2a;
     border: 0.5px solid var(--border-strong);
     border-radius: var(--radius-sm);
     padding: 8px 10px;
@@ -296,7 +296,7 @@
     color: #fff !important;
     border-color: var(--text-primary) !important;
   }
-  #modal-save:hover { background: #333 !important; }
+  #modal-save:hover { background: #555 !important; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -320,7 +320,7 @@
 <div id="outer">
   <div id="y-axis-label">
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 9V1M1 5l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    higher priority &nbsp;&nbsp;&nbsp; lower priority
+    lower priority &nbsp;&nbsp;&nbsp; higher priority
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
 
