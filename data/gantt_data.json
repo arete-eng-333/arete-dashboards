@@ -6,7 +6,7 @@
       "assignee": "Alex",
       "start": "2026-05-01",
       "end": "2026-06-11",
-      "status": ""
+      "status": "onhold"
     },
     {
       "id": 4,
@@ -146,5 +146,5 @@
     }
   ],
   "nextId": 27,
-  "updatedAt": "2026-06-02T19:21:35.275Z"
+  "updatedAt": "2026-06-02T19:25:23.362Z"
 }
