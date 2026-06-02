@@ -1,14 +1,6 @@
 {
   "projects": [
     {
-      "id": 1,
-      "name": "26304-FatIce",
-      "assignee": "Luke",
-      "start": "2026-05-03",
-      "end": "2026-05-08",
-      "status": "ontrack"
-    },
-    {
       "id": 2,
       "name": "25309-BASF HWST",
       "assignee": "Victoria",
@@ -170,5 +162,5 @@
     }
   ],
   "nextId": 27,
-  "updatedAt": "2026-05-28T13:25:44.720Z"
+  "updatedAt": "2026-06-02T16:52:06.094Z"
 }
