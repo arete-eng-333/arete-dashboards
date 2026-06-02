@@ -143,8 +143,16 @@
       "start": "2026-06-02",
       "end": "2026-06-19",
       "status": "onhold"
+    },
+    {
+      "id": 28,
+      "name": "25304 - Reticle Room - 50%",
+      "assignee": "Luke",
+      "start": "2026-06-02",
+      "end": "2026-06-26",
+      "status": "ontrack"
     }
   ],
-  "nextId": 28,
-  "updatedAt": "2026-06-02T19:54:42.033Z"
+  "nextId": 29,
+  "updatedAt": "2026-06-02T20:08:49.810Z"
 }
