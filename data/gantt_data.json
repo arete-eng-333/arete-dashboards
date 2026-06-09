@@ -42,7 +42,7 @@
     },
     {
       "id": 8,
-      "name": "26302-SAS F1 Slurry - 90% (F126-SG01)",
+      "name": "26302-SAS F1 Slurry - 90% (F126-CH03)",
       "assignee": "Alex",
       "start": "2026-05-03",
       "end": "2026-06-16",
@@ -154,5 +154,5 @@
     }
   ],
   "nextId": 29,
-  "updatedAt": "2026-06-09T15:23:03.769Z"
+  "updatedAt": "2026-06-09T15:23:36.634Z"
 }
