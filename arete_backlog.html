@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arete · Backlog & Outlook</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #171b24;
+    --border:    #252a36;
+    --muted:     #3a4055;
+    --text-dim:  #6b7280;
+    --text:      #d1d5db;
+    --text-hi:   #f3f4f6;
+    --accent:    #4f8ef7;
+    --green:     #34d399;
+    --amber:     #fbbf24;
+    --red:       #f87171;
+    --purple:    #a78bfa;
+    --radius:    6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ──────────────────────────────────────────── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); font-weight: 500; }
+  .logo span { color: var(--accent); }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .sync-status { font-size: 11px; color: var(--text-dim); font-family: 'DM Mono', monospace; }
+  button {
+    background: var(--muted);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  button:hover { background: #4a5170; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover { background: #3d7de8; }
+  button.danger { background: transparent; color: var(--red); border-color: var(--red); }
+  button.danger:hover { background: rgba(248,113,113,0.1); }
+
+  /* ── LAYOUT ──────────────────────────────────────────── */
+  main { padding: 24px 28px; max-width: 1400px; }
+
+  /* ── RUNWAY STRIP ─────────────────────────────────────── */
+  .runway-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .runway-cell {
+    background: var(--surface);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .runway-cell.editable { cursor: pointer; }
+  .runway-cell.editable:hover { background: #1c2130; }
+  .runway-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); font-weight: 500; }
+  .runway-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--text-hi); }
+  .runway-value.accent { color: var(--accent); }
+  .runway-value.green  { color: var(--green); }
+  .runway-value.amber  { color: var(--amber); }
+  .runway-value.red    { color: var(--red); }
+  .runway-sub { font-size: 11px; color: var(--text-dim); }
+
+  /* ── SECTION HEADERS ──────────────────────────────────── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--muted);
+    color: var(--text-dim);
+  }
+
+  /* ── TABLE ────────────────────────────────────────────── */
+  .table-wrap {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: var(--surface);
+    padding: 9px 14px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  thead th.num { text-align: right; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(79,142,247,0.04); }
+  tbody td { padding: 10px 14px; vertical-align: middle; }
+  tbody td.num { text-align: right; font-family: 'DM Mono', monospace; font-size: 12px; }
+  tbody td.name { color: var(--text-hi); font-weight: 500; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .zero { color: var(--muted); }
+  .add-row td { background: var(--surface); }
+  .add-row td input[type=text], .add-row td input[type=number] {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--muted);
+    color: var(--text-hi);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    width: 100%;
+    padding: 2px 0;
+    outline: none;
+  }
+  .add-row td input[type=text] { font-family: 'Inter', sans-serif; color: var(--text-hi); }
+  .add-row td input::placeholder { color: var(--muted); }
+  .add-row td input:focus { border-bottom-color: var(--accent); }
+  .totals-row td { background: var(--surface); font-weight: 600; color: var(--text-hi); border-top: 1px solid var(--border); }
+  .totals-row td.num { font-family: 'DM Mono', monospace; font-size: 12px; }
+
+  /* probability pill */
+  .prob-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .prob-hi  { background: rgba(52,211,153,0.12); color: var(--green); }
+  .prob-mid { background: rgba(251,191,36,0.12);  color: var(--amber); }
+  .prob-lo  { background: rgba(248,113,113,0.12); color: var(--red); }
+
+  /* action icons */
+  .act-btn {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 14px; padding: 2px 6px; border-radius: 3px;
+    transition: color 0.1s, background 0.1s;
+  }
+  .act-btn:hover { color: var(--red); background: rgba(248,113,113,0.08); }
+
+  /* ── MODAL ────────────────────────────────────────────── */
+  .modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    width: 360px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .modal h3 { font-size: 14px; color: var(--text-hi); font-weight: 600; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; }
+  .field input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-hi);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+
+  /* ── GH SETTINGS ──────────────────────────────────────── */
+  .gh-banner {
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .gh-banner button { border-color: var(--amber); color: var(--amber); }
+  .gh-banner button:hover { background: rgba(251,191,36,0.08); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span>Arete</span> Engineering · Backlog &amp; Outlook</div>
+  <div class="header-right">
+    <span class="sync-status" id="syncStatus">not connected</span>
+    <button onclick="openGHSettings()">⚙ GitHub</button>
+    <button class="primary" onclick="saveData()">↑ Save</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- GitHub not configured banner -->
+  <div class="gh-banner" id="ghBanner" style="display:none">
+    ⚠ GitHub not configured — data will only persist in your browser until you add your token, repo, and file path.
+    <button onclick="openGHSettings()">Configure</button>
+  </div>
+
+  <!-- RUNWAY STRIP -->
+  <div class="runway-strip">
+    <div class="runway-cell editable" onclick="openExpenseModal()" title="Click to edit">
+      <div class="runway-label">Monthly Burn Rate</div>
+      <div class="runway-value accent" id="burnDisplay">—</div>
+      <div class="runway-sub">click to update</div>
+    </div>
+    <div class="runway-cell">
+      <div class="runway-label">Active Backlog</div>
+      <div class="runway-value" id="activeBacklogDisplay">—</div>
+      <div class="runway-sub">WIP + backlog on active projects</div>
+    </div>
+    <div class="runway-cell">
+      <div class="runway-label">Runway · Active Only</div>
+      <div class="runway-value" id="runwayActiveDisplay">—</div>
+      <div class="runway-sub">months at current burn</div>
+    </div>
+    <div class="runway-cell">
+      <div class="runway-label">Runway · With Proposals</div>
+      <div class="runway-value" id="runwayProposalDisplay">—</div>
+      <div class="runway-sub">+ weighted proposal value</div>
+    </div>
+  </div>
+
+  <!-- ACTIVE PROJECTS -->
+  <div class="section-header">
+    <span class="section-title">Active Projects</span>
+    <span class="badge" id="activeCount">0</span>
+  </div>
+  <div class="table-wrap" id="activeTableWrap">
+    <table id="activeTable">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th class="num">Invoiced</th>
+          <th class="num">WIP</th>
+          <th class="num">Backlog</th>
+          <th class="num">Total Contracted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="activeBody"></tbody>
+      <tfoot>
+        <tr class="totals-row" id="activeTotals">
+          <td>Totals</td>
+          <td class="num" id="totInvoiced">$0</td>
+          <td class="num" id="totWip">$0</td>
+          <td class="num" id="totBacklog">$0</td>
+          <td class="num" id="totContracted">$0</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="section-header" style="margin-top:-18px; margin-bottom:20px;">
+    <button onclick="openAddActive()">+ Add Active Project</button>
+  </div>
+
+  <!-- PROPOSED PROJECTS -->
+  <div class="section-header">
+    <span class="section-title">Proposed Projects</span>
+    <span class="badge" id="proposalCount">0</span>
+  </div>
+  <div class="table-wrap">
+    <table id="proposalTable">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th class="num">Proposal Amount</th>
+          <th class="num">Win Probability</th>
+          <th class="num">Weighted Value</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="proposalBody"></tbody>
+      <tfoot>
+        <tr class="totals-row">
+          <td>Totals</td>
+          <td class="num" id="totPropAmount">$0</td>
+          <td class="num">—</td>
+          <td class="num" id="totWeighted">$0</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="section-header" style="margin-top:-18px; margin-bottom:20px;">
+    <button onclick="openAddProposal()">+ Add Proposed Project</button>
+  </div>
+
+</main>
+
+<!-- EXPENSE MODAL -->
+<div class="modal-bg" id="expenseModal">
+  <div class="modal">
+    <h3>Monthly Burn Rate</h3>
+    <div class="field">
+      <label>Total Monthly Expenses ($)</label>
+      <input type="number" id="expenseInput" placeholder="e.g. 120000" min="0">
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeExpenseModal()">Cancel</button>
+      <button class="primary" onclick="saveExpense()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ACTIVE PROJECT MODAL -->
+<div class="modal-bg" id="addActiveModal">
+  <div class="modal">
+    <h3>Add Active Project</h3>
+    <div class="field"><label>Project Name</label><input type="text" id="aName" placeholder="Project name or number"></div>
+    <div class="field"><label>Invoiced ($)</label><input type="number" id="aInvoiced" placeholder="0" min="0"></div>
+    <div class="field"><label>WIP ($)</label><input type="number" id="aWip" placeholder="0" min="0"></div>
+    <div class="field"><label>Backlog ($)</label><input type="number" id="aBacklog" placeholder="0" min="0"></div>
+    <div class="modal-actions">
+      <button onclick="closeAddActive()">Cancel</button>
+      <button class="primary" onclick="saveActiveProject()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PROPOSAL MODAL -->
+<div class="modal-bg" id="addProposalModal">
+  <div class="modal">
+    <h3>Add Proposed Project</h3>
+    <div class="field"><label>Project Name</label><input type="text" id="pName" placeholder="Project name or number"></div>
+    <div class="field"><label>Proposal Amount ($)</label><input type="number" id="pAmount" placeholder="0" min="0"></div>
+    <div class="field"><label>Win Probability (%)</label><input type="number" id="pProb" placeholder="e.g. 60" min="0" max="100"></div>
+    <div class="modal-actions">
+      <button onclick="closeAddProposal()">Cancel</button>
+      <button class="primary" onclick="saveProposal()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- GITHUB SETTINGS MODAL -->
+<div class="modal-bg" id="ghModal">
+  <div class="modal">
+    <h3>GitHub Data Backend</h3>
+    <div class="field"><label>Personal Access Token</label><input type="password" id="ghToken" placeholder="ghp_..."></div>
+    <div class="field"><label>Repo (owner/repo)</label><input type="text" id="ghRepo" placeholder="arete-eng-333/arete-dashboards"></div>
+    <div class="field"><label>File Path</label><input type="text" id="ghPath" placeholder="data/backlog_data.json"></div>
+    <div class="field"><label>Branch</label><input type="text" id="ghBranch" placeholder="main"></div>
+    <div class="modal-actions">
+      <button onclick="closeGHSettings()">Cancel</button>
+      <button class="primary" onclick="saveGHSettings()">Save & Load</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────
+let state = {
+  monthlyBurn: 0,
+  active: [],
+  proposals: []
+};
+// id counter
+let _id = 1;
+function uid() { return _id++; }
+
+// ── GITHUB CONFIG ─────────────────────────────────────────
+function ghConfig() {
+  return {
+    token:  localStorage.getItem('gh_backlog_token')  || '',
+    repo:   localStorage.getItem('gh_backlog_repo')   || '',
+    path:   localStorage.getItem('gh_backlog_path')   || '',
+    branch: localStorage.getItem('gh_backlog_branch') || 'main'
+  };
+}
+
+function openGHSettings() {
+  const c = ghConfig();
+  document.getElementById('ghToken').value  = c.token;
+  document.getElementById('ghRepo').value   = c.repo;
+  document.getElementById('ghPath').value   = c.path;
+  document.getElementById('ghBranch').value = c.branch;
+  document.getElementById('ghModal').classList.add('open');
+}
+function closeGHSettings() { document.getElementById('ghModal').classList.remove('open'); }
+
+function saveGHSettings() {
+  const t = document.getElementById('ghToken').value.trim();
+  const r = document.getElementById('ghRepo').value.trim();
+  const p = document.getElementById('ghPath').value.trim();
+  const b = document.getElementById('ghBranch').value.trim() || 'main';
+  localStorage.setItem('gh_backlog_token',  t);
+  localStorage.setItem('gh_backlog_repo',   r);
+  localStorage.setItem('gh_backlog_path',   p);
+  localStorage.setItem('gh_backlog_branch', b);
+  closeGHSettings();
+  loadData();
+}
+
+function setStatus(msg, color) {
+  const el = document.getElementById('syncStatus');
+  el.textContent = msg;
+  el.style.color = color || 'var(--text-dim)';
+}
+
+// ── LOAD FROM GITHUB ──────────────────────────────────────
+async function loadData() {
+  const c = ghConfig();
+  if (!c.token || !c.repo || !c.path) {
+    document.getElementById('ghBanner').style.display = 'flex';
+    loadLocalFallback();
+    return;
+  }
+  document.getElementById('ghBanner').style.display = 'none';
+  setStatus('loading…', 'var(--amber)');
+  try {
+    const url = `https://api.github.com/repos/${c.repo}/contents/${c.path}?ref=${c.branch}&t=${Date.now()}`;
+    const res = await fetch(url, { headers: { Authorization: `token ${c.token}`, Accept: 'application/vnd.github.v3+json' } });
+    if (res.status === 404) {
+      setStatus('new file — save to create', 'var(--text-dim)');
+      return;
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    state = JSON.parse(atob(json.content.replace(/\n/g, '')));
+    if (!state.active) state.active = [];
+    if (!state.proposals) state.proposals = [];
+    // re-sync id counter
+    const allIds = [...state.active.map(r=>r.id||0), ...state.proposals.map(r=>r.id||0)];
+    _id = allIds.length ? Math.max(...allIds) + 1 : 1;
+    render();
+    setStatus(`loaded ${new Date().toLocaleTimeString()}`, 'var(--green)');
+  } catch(e) {
+    setStatus('load failed — using cache', 'var(--red)');
+    loadLocalFallback();
+  }
+}
+
+function loadLocalFallback() {
+  const raw = localStorage.getItem('arete_backlog_state');
+  if (raw) { state = JSON.parse(raw); }
+  render();
+}
+
+// ── SAVE TO GITHUB ────────────────────────────────────────
+async function saveData() {
+  localStorage.setItem('arete_backlog_state', JSON.stringify(state));
+  const c = ghConfig();
+  if (!c.token || !c.repo || !c.path) { setStatus('saved locally', 'var(--amber)'); return; }
+  setStatus('saving…', 'var(--amber)');
+  try {
+    // get current sha
+    const getUrl = `https://api.github.com/repos/${c.repo}/contents/${c.path}?ref=${c.branch}&t=${Date.now()}`;
+    const getRes = await fetch(getUrl, { headers: { Authorization: `token ${c.token}`, Accept: 'application/vnd.github.v3+json' } });
+    let sha = null;
+    if (getRes.ok) { const g = await getRes.json(); sha = g.sha; }
+
+    const body = { message: 'update backlog data', content: btoa(JSON.stringify(state, null, 2)), branch: c.branch };
+    if (sha) body.sha = sha;
+
+    const putRes = await fetch(`https://api.github.com/repos/${c.repo}/contents/${c.path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${c.token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!putRes.ok) throw new Error(`HTTP ${putRes.status}`);
+    setStatus(`saved ${new Date().toLocaleTimeString()}`, 'var(--green)');
+  } catch(e) {
+    setStatus('save failed', 'var(--red)');
+  }
+}
+
+// ── FORMATTING ────────────────────────────────────────────
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+function fmtMo(n) {
+  if (!isFinite(n) || n <= 0) return '—';
+  return n.toFixed(1) + ' mo';
+}
+function probPill(p) {
+  const cls = p >= 70 ? 'prob-hi' : p >= 40 ? 'prob-mid' : 'prob-lo';
+  return `<span class="prob-pill ${cls}">${p}%</span>`;
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function render() {
+  renderActive();
+  renderProposals();
+  renderRunway();
+}
+
+function renderActive() {
+  const tbody = document.getElementById('activeBody');
+  tbody.innerHTML = '';
+  let tInv=0, tWip=0, tBack=0;
+  state.active.forEach(p => {
+    const contracted = (p.invoiced||0)+(p.wip||0)+(p.backlog||0);
+    tInv  += p.invoiced||0;
+    tWip  += p.wip||0;
+    tBack += p.backlog||0;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="name">${esc(p.name)}</td>
+      <td class="num ${!p.invoiced?'zero':''}">${fmt(p.invoiced)}</td>
+      <td class="num ${!p.wip?'zero':''}">${fmt(p.wip)}</td>
+      <td class="num ${!p.backlog?'zero':''}">${fmt(p.backlog)}</td>
+      <td class="num">${fmt(contracted)}</td>
+      <td><button class="act-btn" onclick="deleteActive(${p.id})" title="Remove">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('totInvoiced').textContent  = fmt(tInv);
+  document.getElementById('totWip').textContent       = fmt(tWip);
+  document.getElementById('totBacklog').textContent   = fmt(tBack);
+  document.getElementById('totContracted').textContent= fmt(tInv+tWip+tBack);
+  document.getElementById('activeCount').textContent  = state.active.length;
+}
+
+function renderProposals() {
+  const tbody = document.getElementById('proposalBody');
+  tbody.innerHTML = '';
+  let tAmt=0, tW=0;
+  state.proposals.forEach(p => {
+    const weighted = Math.round((p.amount||0)*(p.prob||0)/100);
+    tAmt += p.amount||0;
+    tW   += weighted;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="name">${esc(p.name)}</td>
+      <td class="num">${fmt(p.amount)}</td>
+      <td class="num">${probPill(p.prob||0)}</td>
+      <td class="num">${fmt(weighted)}</td>
+      <td><button class="act-btn" onclick="deleteProposal(${p.id})" title="Remove">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('totPropAmount').textContent = fmt(tAmt);
+  document.getElementById('totWeighted').textContent   = fmt(tW);
+  document.getElementById('proposalCount').textContent = state.proposals.length;
+}
+
+function renderRunway() {
+  const burn = state.monthlyBurn || 0;
+  document.getElementById('burnDisplay').textContent = burn ? fmt(burn) : '—';
+
+  // active backlog = WIP + backlog (not yet invoiced)
+  const activeBacklog = state.active.reduce((s,p)=>(s+(p.wip||0)+(p.backlog||0)),0);
+  document.getElementById('activeBacklogDisplay').textContent = fmt(activeBacklog);
+
+  // weighted proposals
+  const weighted = state.proposals.reduce((s,p)=>(s+Math.round((p.amount||0)*(p.prob||0)/100)),0);
+
+  if (burn > 0) {
+    const rwActive   = activeBacklog / burn;
+    const rwProposal = (activeBacklog + weighted) / burn;
+    const el1 = document.getElementById('runwayActiveDisplay');
+    const el2 = document.getElementById('runwayProposalDisplay');
+    el1.textContent = fmtMo(rwActive);
+    el2.textContent = fmtMo(rwProposal);
+    el1.className = 'runway-value ' + runwayColor(rwActive);
+    el2.className = 'runway-value ' + runwayColor(rwProposal);
+  } else {
+    document.getElementById('runwayActiveDisplay').textContent   = '—';
+    document.getElementById('runwayProposalDisplay').textContent = '—';
+  }
+}
+
+function runwayColor(mo) {
+  if (mo >= 6) return 'green';
+  if (mo >= 3) return 'amber';
+  return 'red';
+}
+
+// ── EXPENSE MODAL ─────────────────────────────────────────
+function openExpenseModal() {
+  document.getElementById('expenseInput').value = state.monthlyBurn || '';
+  document.getElementById('expenseModal').classList.add('open');
+}
+function closeExpenseModal() { document.getElementById('expenseModal').classList.remove('open'); }
+function saveExpense() {
+  state.monthlyBurn = parseFloat(document.getElementById('expenseInput').value) || 0;
+  closeExpenseModal();
+  renderRunway();
+}
+
+// ── ADD ACTIVE ────────────────────────────────────────────
+function openAddActive() {
+  ['aName','aInvoiced','aWip','aBacklog'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('addActiveModal').classList.add('open');
+  setTimeout(()=>document.getElementById('aName').focus(),50);
+}
+function closeAddActive() { document.getElementById('addActiveModal').classList.remove('open'); }
+function saveActiveProject() {
+  const name = document.getElementById('aName').value.trim();
+  if (!name) { document.getElementById('aName').focus(); return; }
+  state.active.push({
+    id: uid(),
+    name,
+    invoiced: parseFloat(document.getElementById('aInvoiced').value)||0,
+    wip:      parseFloat(document.getElementById('aWip').value)||0,
+    backlog:  parseFloat(document.getElementById('aBacklog').value)||0
+  });
+  closeAddActive();
+  render();
+}
+function deleteActive(id) {
+  state.active = state.active.filter(p=>p.id!==id);
+  render();
+}
+
+// ── ADD PROPOSAL ──────────────────────────────────────────
+function openAddProposal() {
+  ['pName','pAmount','pProb'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('addProposalModal').classList.add('open');
+  setTimeout(()=>document.getElementById('pName').focus(),50);
+}
+function closeAddProposal() { document.getElementById('addProposalModal').classList.remove('open'); }
+function saveProposal() {
+  const name = document.getElementById('pName').value.trim();
+  if (!name) { document.getElementById('pName').focus(); return; }
+  state.proposals.push({
+    id:     uid(),
+    name,
+    amount: parseFloat(document.getElementById('pAmount').value)||0,
+    prob:   Math.min(100,Math.max(0,parseFloat(document.getElementById('pProb').value)||0))
+  });
+  closeAddProposal();
+  render();
+}
+function deleteProposal(id) {
+  state.proposals = state.proposals.filter(p=>p.id!==id);
+  render();
+}
+
+// ── UTILS ─────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// close modals on bg click
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if(e.target===bg) bg.classList.remove('open'); });
+});
+
+// ── INIT ──────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
