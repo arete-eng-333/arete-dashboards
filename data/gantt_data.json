@@ -53,8 +53,8 @@
       "name": "25304A-Labs - N Lab - 90%",
       "assignee": "Victoria",
       "start": "2026-05-03",
-      "end": "2026-06-19",
-      "status": "atrisk"
+      "end": "2026-06-23",
+      "status": "ontrack"
     },
     {
       "id": 10,
@@ -154,5 +154,5 @@
     }
   ],
   "nextId": 29,
-  "updatedAt": "2026-06-09T15:23:36.634Z"
+  "updatedAt": "2026-06-11T17:37:10.465Z"
 }
