@@ -137,14 +137,6 @@
       "status": "ontrack"
     },
     {
-      "id": 27,
-      "name": "25319 - SAS 14k - Demo (F126-SG01)",
-      "assignee": "Luke",
-      "start": "2026-06-02",
-      "end": "2026-06-19",
-      "status": "onhold"
-    },
-    {
       "id": 28,
       "name": "25304 - Reticle Room - 50%",
       "assignee": "Luke",
@@ -154,5 +146,5 @@
     }
   ],
   "nextId": 29,
-  "updatedAt": "2026-06-12T13:33:47.363Z"
+  "updatedAt": "2026-06-12T21:52:43.148Z"
 }
