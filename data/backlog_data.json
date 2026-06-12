@@ -9,5 +9,12 @@
       "backlog": 28255
     }
   ],
-  "proposals": []
+  "proposals": [
+    {
+      "id": 2,
+      "name": "SAS ERT Building",
+      "amount": 59200,
+      "prob": 50
+    }
+  ]
 }
