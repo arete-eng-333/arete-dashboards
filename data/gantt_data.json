@@ -89,14 +89,6 @@
       "status": "ca"
     },
     {
-      "id": 16,
-      "name": "25319-CAPA 14k GCS Demo - IFC (F126-SG01)",
-      "assignee": "Alex",
-      "start": "2026-05-08",
-      "end": "2026-05-29",
-      "status": "onhold"
-    },
-    {
       "id": 18,
       "name": "23309-SAS Waste Expansion",
       "assignee": "Alex",
@@ -146,5 +138,5 @@
     }
   ],
   "nextId": 29,
-  "updatedAt": "2026-06-12T21:53:27.869Z"
+  "updatedAt": "2026-06-12T21:53:50.834Z"
 }
