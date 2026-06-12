@@ -134,7 +134,7 @@
       "assignee": "Alex",
       "start": "2026-05-04",
       "end": "2026-06-26",
-      "status": "ontrack"
+      "status": "onhold"
     },
     {
       "id": 28,
@@ -146,5 +146,5 @@
     }
   ],
   "nextId": 29,
-  "updatedAt": "2026-06-12T21:53:22.294Z"
+  "updatedAt": "2026-06-12T21:53:27.869Z"
 }
