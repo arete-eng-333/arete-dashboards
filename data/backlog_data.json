@@ -3,10 +3,24 @@
   "active": [
     {
       "id": 1,
-      "name": "25310",
+      "name": "25310 - Westminister DX",
       "invoiced": 0,
       "wip": 0,
       "backlog": 28255
+    },
+    {
+      "id": 13,
+      "name": "25304 - MR2 THU",
+      "invoiced": 0,
+      "wip": 0,
+      "backlog": 0
+    },
+    {
+      "id": 14,
+      "name": "25311 - SAS TMAH",
+      "invoiced": 0,
+      "wip": 40000,
+      "backlog": 40000
     }
   ],
   "proposals": [
