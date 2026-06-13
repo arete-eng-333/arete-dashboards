@@ -69,6 +69,12 @@
       "name": "SAS CAPA Case 77",
       "amount": 51700,
       "prob": 25
+    },
+    {
+      "id": 12,
+      "name": "CPI",
+      "amount": 1206500,
+      "prob": 33
     }
   ],
   "cashOnHand": 1300000
