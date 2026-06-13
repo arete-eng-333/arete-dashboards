@@ -163,7 +163,30 @@
   .add-row td input::placeholder { color: var(--muted); }
   .add-row td input:focus { border-bottom-color: var(--accent); }
   .totals-row td { background: var(--surface); font-weight: 600; color: var(--text-hi); border-top: 1px solid var(--border); }
-  .totals-row td.num { font-family: 'DM Mono', monospace; font-size: 12px; }
+  .totals-row td.num { font-family: 'DM Mono', monospace; font-size: 12px; text-align: right; }
+
+  /* custom checkbox */
+  .row-check {
+    appearance: none; -webkit-appearance: none;
+    width: 15px; height: 15px; border-radius: 3px;
+    border: 1.5px solid var(--muted);
+    background: transparent; cursor: pointer;
+    position: relative; flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+    vertical-align: middle;
+  }
+  .row-check:checked {
+    background: var(--accent); border-color: var(--accent);
+  }
+  .row-check:checked::after {
+    content: '';
+    position: absolute; left: 3px; top: 0px;
+    width: 5px; height: 9px;
+    border: 2px solid #fff; border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  tbody tr.excluded { opacity: 0.35; }
+  tbody tr.excluded .name { text-decoration: line-through; }
 
   /* probability pill */
   .prob-pill {
@@ -261,7 +284,11 @@
       <div class="runway-sub">click to update</div>
     </div>
     <div class="runway-cell editable" onclick="openCashModal()" title="Click to edit">
-      <div class="runway-label">Cash on Hand</div>
+      <div class="runway-label">
+        Cash on Hand
+        <input type="checkbox" class="row-check" id="cashCheck" style="margin-left:6px; vertical-align:middle" checked
+          onclick="event.stopPropagation(); toggleCash(this.checked)">
+      </div>
       <div class="runway-value accent" id="cashDisplay">—</div>
       <div class="runway-sub">click to update</div>
     </div>
@@ -291,8 +318,9 @@
     <table id="activeTable">
       <thead>
         <tr>
+          <th style="width:28px"></th>
           <th>Project</th>
-          <th class="num">Contract Amount</th>
+          <th class="num">Service Amount</th>
           <th class="num">Invoiced</th>
           <th class="num">Remaining</th>
           <th></th>
@@ -301,7 +329,8 @@
       <tbody id="activeBody"></tbody>
       <tfoot>
         <tr class="totals-row" id="activeTotals">
-          <td>Totals</td>
+          <td></td>
+          <td>Checked Totals</td>
           <td class="num" id="totContracted">$0</td>
           <td class="num" id="totInvoiced">$0</td>
           <td class="num" id="totRemaining">$0</td>
@@ -323,6 +352,7 @@
     <table id="proposalTable">
       <thead>
         <tr>
+          <th style="width:28px"></th>
           <th>Project</th>
           <th class="num">Proposal Amount</th>
           <th class="num">Win Probability</th>
@@ -333,7 +363,8 @@
       <tbody id="proposalBody"></tbody>
       <tfoot>
         <tr class="totals-row">
-          <td>Totals</td>
+          <td></td>
+          <td>Checked Totals</td>
           <td class="num" id="totPropAmount">$0</td>
           <td class="num">—</td>
           <td class="num" id="totWeighted">$0</td>
@@ -565,12 +596,19 @@ function renderActive() {
   tbody.innerHTML = '';
   let tContract=0, tInv=0, tRemaining=0;
   state.active.forEach(p => {
+    const included = p.included !== false;
     const remaining = Math.max(0, (p.contract||0) - (p.invoiced||0));
-    tContract  += p.contract||0;
-    tInv       += p.invoiced||0;
-    tRemaining += remaining;
+    if (included) {
+      tContract  += p.contract||0;
+      tInv       += p.invoiced||0;
+      tRemaining += remaining;
+    }
     const tr = document.createElement('tr');
+    if (!included) tr.classList.add('excluded');
     tr.innerHTML = `
+      <td style="padding:10px 8px 10px 14px">
+        <input type="checkbox" class="row-check" ${included?'checked':''} onchange="toggleActive(${p.id}, this.checked)">
+      </td>
       <td class="name">${esc(p.name)}</td>
       <td class="num">${fmt(p.contract)}</td>
       <td class="num ${!p.invoiced?'zero':''}">${fmt(p.invoiced)}</td>
@@ -593,11 +631,18 @@ function renderProposals() {
   tbody.innerHTML = '';
   let tAmt=0, tW=0;
   state.proposals.forEach(p => {
+    const included = p.included !== false;
     const weighted = Math.round((p.amount||0)*(p.prob||0)/100);
-    tAmt += p.amount||0;
-    tW   += weighted;
+    if (included) {
+      tAmt += p.amount||0;
+      tW   += weighted;
+    }
     const tr = document.createElement('tr');
+    if (!included) tr.classList.add('excluded');
     tr.innerHTML = `
+      <td style="padding:10px 8px 10px 14px">
+        <input type="checkbox" class="row-check" ${included?'checked':''} onchange="toggleProposal(${p.id}, this.checked)">
+      </td>
       <td class="name">${esc(p.name)}</td>
       <td class="num">${fmt(p.amount)}</td>
       <td class="num">${probPill(p.prob||0)}</td>
@@ -616,16 +661,23 @@ function renderProposals() {
 
 function renderRunway() {
   const burn = state.monthlyBurn || 0;
-  const cash = state.cashOnHand  || 0;
+  const cashIncluded = state.cashIncluded !== false;
+  const cash = cashIncluded ? (state.cashOnHand || 0) : 0;
   document.getElementById('burnDisplay').textContent = burn ? fmt(burn) : '—';
-  document.getElementById('cashDisplay').textContent = cash ? fmt(cash) : '—';
+  document.getElementById('cashDisplay').textContent = state.cashOnHand ? fmt(state.cashOnHand) : '—';
+  const cashChk = document.getElementById('cashCheck');
+  if (cashChk) cashChk.checked = cashIncluded;
 
-  // active remaining = contract - invoiced
-  const activeBacklog = state.active.reduce((s,p)=>s + Math.max(0,(p.contract||0)-(p.invoiced||0)), 0);
+  // only included active projects
+  const activeBacklog = state.active
+    .filter(p => p.included !== false)
+    .reduce((s,p) => s + Math.max(0,(p.contract||0)-(p.invoiced||0)), 0);
   document.getElementById('activeBacklogDisplay').textContent = fmt(activeBacklog);
 
-  // weighted proposals
-  const weighted = state.proposals.reduce((s,p)=>(s+Math.round((p.amount||0)*(p.prob||0)/100)),0);
+  // only included proposals
+  const weighted = state.proposals
+    .filter(p => p.included !== false)
+    .reduce((s,p) => s + Math.round((p.amount||0)*(p.prob||0)/100), 0);
 
   if (burn > 0) {
     const rwActive   = (cash + activeBacklog) / burn;
@@ -660,7 +712,10 @@ function saveExpense() {
   renderRunway();
 }
 
-// ── CASH MODAL ────────────────────────────────────────────
+function toggleCash(checked) {
+  state.cashIncluded = checked;
+  renderRunway();
+}
 function openCashModal() {
   document.getElementById('cashInput').value = state.cashOnHand || '';
   document.getElementById('cashModal').classList.add('open');
@@ -714,6 +769,10 @@ function deleteActive(id) {
   state.active = state.active.filter(p=>p.id!==id);
   render();
 }
+function toggleActive(id, checked) {
+  const p = state.active.find(x=>x.id===id);
+  if (p) { p.included = checked; render(); }
+}
 
 // ── ADD / EDIT PROPOSAL ───────────────────────────────────
 let _editProposalId = null;
@@ -756,6 +815,10 @@ function saveProposal() {
 function deleteProposal(id) {
   state.proposals = state.proposals.filter(p=>p.id!==id);
   render();
+}
+function toggleProposal(id, checked) {
+  const p = state.proposals.find(x=>x.id===id);
+  if (p) { p.included = checked; render(); }
 }
 
 // ── UTILS ─────────────────────────────────────────────────
