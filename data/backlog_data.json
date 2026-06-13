@@ -33,6 +33,12 @@
       "name": "SAS RCS",
       "amount": 956500,
       "prob": 20
+    },
+    {
+      "id": 6,
+      "name": "SAS ICPMS PH6",
+      "amount": 12000,
+      "prob": 50
     }
   ],
   "cashOnHand": 1000000
