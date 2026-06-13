@@ -185,6 +185,7 @@
     transition: color 0.1s, background 0.1s;
   }
   .act-btn:hover { color: var(--red); background: rgba(248,113,113,0.08); }
+  .act-btn.edit-btn:hover { color: var(--accent); background: rgba(79,142,247,0.08); }
 
   /* ── MODAL ────────────────────────────────────────────── */
   .modal-bg {
@@ -578,7 +579,10 @@ function renderActive() {
       <td class="num ${!p.wip?'zero':''}">${fmt(p.wip)}</td>
       <td class="num ${!p.backlog?'zero':''}">${fmt(p.backlog)}</td>
       <td class="num">${fmt(contracted)}</td>
-      <td><button class="act-btn" onclick="deleteActive(${p.id})" title="Remove">✕</button></td>
+      <td style="white-space:nowrap">
+        <button class="act-btn edit-btn" onclick="editActive(${p.id})" title="Edit">✎</button>
+        <button class="act-btn" onclick="deleteActive(${p.id})" title="Remove">✕</button>
+      </td>
     `;
     tbody.appendChild(tr);
   });
@@ -603,7 +607,10 @@ function renderProposals() {
       <td class="num">${fmt(p.amount)}</td>
       <td class="num">${probPill(p.prob||0)}</td>
       <td class="num">${fmt(weighted)}</td>
-      <td><button class="act-btn" onclick="deleteProposal(${p.id})" title="Remove">✕</button></td>
+      <td style="white-space:nowrap">
+        <button class="act-btn edit-btn" onclick="editProposal(${p.id})" title="Edit">✎</button>
+        <button class="act-btn" onclick="deleteProposal(${p.id})" title="Remove">✕</button>
+      </td>
     `;
     tbody.appendChild(tr);
   });
@@ -670,9 +677,24 @@ function saveCash() {
   renderRunway();
 }
 
-// ── ADD ACTIVE ────────────────────────────────────────────
+// ── ADD / EDIT ACTIVE ─────────────────────────────────────
+let _editActiveId = null;
 function openAddActive() {
+  _editActiveId = null;
   ['aName','aInvoiced','aWip','aBacklog'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('addActiveModal').querySelector('h3').textContent = 'Add Active Project';
+  document.getElementById('addActiveModal').classList.add('open');
+  setTimeout(()=>document.getElementById('aName').focus(),50);
+}
+function editActive(id) {
+  const p = state.active.find(x=>x.id===id);
+  if (!p) return;
+  _editActiveId = id;
+  document.getElementById('aName').value     = p.name;
+  document.getElementById('aInvoiced').value = p.invoiced||'';
+  document.getElementById('aWip').value      = p.wip||'';
+  document.getElementById('aBacklog').value  = p.backlog||'';
+  document.getElementById('addActiveModal').querySelector('h3').textContent = 'Edit Active Project';
   document.getElementById('addActiveModal').classList.add('open');
   setTimeout(()=>document.getElementById('aName').focus(),50);
 }
@@ -680,13 +702,18 @@ function closeAddActive() { document.getElementById('addActiveModal').classList.
 function saveActiveProject() {
   const name = document.getElementById('aName').value.trim();
   if (!name) { document.getElementById('aName').focus(); return; }
-  state.active.push({
-    id: uid(),
+  const data = {
     name,
     invoiced: parseFloat(document.getElementById('aInvoiced').value)||0,
     wip:      parseFloat(document.getElementById('aWip').value)||0,
     backlog:  parseFloat(document.getElementById('aBacklog').value)||0
-  });
+  };
+  if (_editActiveId !== null) {
+    const idx = state.active.findIndex(x=>x.id===_editActiveId);
+    if (idx > -1) state.active[idx] = { id: _editActiveId, ...data };
+  } else {
+    state.active.push({ id: uid(), ...data });
+  }
   closeAddActive();
   render();
 }
@@ -695,9 +722,23 @@ function deleteActive(id) {
   render();
 }
 
-// ── ADD PROPOSAL ──────────────────────────────────────────
+// ── ADD / EDIT PROPOSAL ───────────────────────────────────
+let _editProposalId = null;
 function openAddProposal() {
+  _editProposalId = null;
   ['pName','pAmount','pProb'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('addProposalModal').querySelector('h3').textContent = 'Add Proposed Project';
+  document.getElementById('addProposalModal').classList.add('open');
+  setTimeout(()=>document.getElementById('pName').focus(),50);
+}
+function editProposal(id) {
+  const p = state.proposals.find(x=>x.id===id);
+  if (!p) return;
+  _editProposalId = id;
+  document.getElementById('pName').value   = p.name;
+  document.getElementById('pAmount').value = p.amount||'';
+  document.getElementById('pProb').value   = p.prob||'';
+  document.getElementById('addProposalModal').querySelector('h3').textContent = 'Edit Proposed Project';
   document.getElementById('addProposalModal').classList.add('open');
   setTimeout(()=>document.getElementById('pName').focus(),50);
 }
@@ -705,12 +746,17 @@ function closeAddProposal() { document.getElementById('addProposalModal').classL
 function saveProposal() {
   const name = document.getElementById('pName').value.trim();
   if (!name) { document.getElementById('pName').focus(); return; }
-  state.proposals.push({
-    id:     uid(),
+  const data = {
     name,
     amount: parseFloat(document.getElementById('pAmount').value)||0,
     prob:   Math.min(100,Math.max(0,parseFloat(document.getElementById('pProb').value)||0))
-  });
+  };
+  if (_editProposalId !== null) {
+    const idx = state.proposals.findIndex(x=>x.id===_editProposalId);
+    if (idx > -1) state.proposals[idx] = { id: _editProposalId, ...data };
+  } else {
+    state.proposals.push({ id: uid(), ...data });
+  }
   closeAddProposal();
   render();
 }
