@@ -51,7 +51,25 @@
       "name": "SAS Fire Water Pump Diesel Generator",
       "amount": 13300,
       "prob": 50
+    },
+    {
+      "id": 9,
+      "name": "SAS ICPMS Ph1",
+      "amount": 25400,
+      "prob": 50
+    },
+    {
+      "id": 10,
+      "name": "SAS CO2 Vaporizer",
+      "amount": 10450,
+      "prob": 50
+    },
+    {
+      "id": 11,
+      "name": "SAS CAPA Case 77",
+      "amount": 51700,
+      "prob": 25
     }
   ],
-  "cashOnHand": 1000000
+  "cashOnHand": 1300000
 }
