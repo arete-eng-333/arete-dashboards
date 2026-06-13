@@ -292,10 +292,9 @@
       <thead>
         <tr>
           <th>Project</th>
+          <th class="num">Contract Amount</th>
           <th class="num">Invoiced</th>
-          <th class="num">WIP</th>
-          <th class="num">Backlog</th>
-          <th class="num">Total Contracted</th>
+          <th class="num">Remaining</th>
           <th></th>
         </tr>
       </thead>
@@ -303,10 +302,9 @@
       <tfoot>
         <tr class="totals-row" id="activeTotals">
           <td>Totals</td>
-          <td class="num" id="totInvoiced">$0</td>
-          <td class="num" id="totWip">$0</td>
-          <td class="num" id="totBacklog">$0</td>
           <td class="num" id="totContracted">$0</td>
+          <td class="num" id="totInvoiced">$0</td>
+          <td class="num" id="totRemaining">$0</td>
           <td></td>
         </tr>
       </tfoot>
@@ -385,9 +383,8 @@
   <div class="modal">
     <h3>Add Active Project</h3>
     <div class="field"><label>Project Name</label><input type="text" id="aName" placeholder="Project name or number"></div>
-    <div class="field"><label>Invoiced ($)</label><input type="number" id="aInvoiced" placeholder="0" min="0"></div>
-    <div class="field"><label>WIP ($)</label><input type="number" id="aWip" placeholder="0" min="0"></div>
-    <div class="field"><label>Backlog ($)</label><input type="number" id="aBacklog" placeholder="0" min="0"></div>
+    <div class="field"><label>Contract Amount ($)</label><input type="number" id="aContract" placeholder="0" min="0"></div>
+    <div class="field"><label>Invoiced to Date ($)</label><input type="number" id="aInvoiced" placeholder="0" min="0"></div>
     <div class="modal-actions">
       <button onclick="closeAddActive()">Cancel</button>
       <button class="primary" onclick="saveActiveProject()">Add</button>
@@ -566,19 +563,18 @@ function render() {
 function renderActive() {
   const tbody = document.getElementById('activeBody');
   tbody.innerHTML = '';
-  let tInv=0, tWip=0, tBack=0;
+  let tContract=0, tInv=0, tRemaining=0;
   state.active.forEach(p => {
-    const contracted = (p.invoiced||0)+(p.wip||0)+(p.backlog||0);
-    tInv  += p.invoiced||0;
-    tWip  += p.wip||0;
-    tBack += p.backlog||0;
+    const remaining = Math.max(0, (p.contract||0) - (p.invoiced||0));
+    tContract  += p.contract||0;
+    tInv       += p.invoiced||0;
+    tRemaining += remaining;
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="name">${esc(p.name)}</td>
+      <td class="num">${fmt(p.contract)}</td>
       <td class="num ${!p.invoiced?'zero':''}">${fmt(p.invoiced)}</td>
-      <td class="num ${!p.wip?'zero':''}">${fmt(p.wip)}</td>
-      <td class="num ${!p.backlog?'zero':''}">${fmt(p.backlog)}</td>
-      <td class="num">${fmt(contracted)}</td>
+      <td class="num">${fmt(remaining)}</td>
       <td style="white-space:nowrap">
         <button class="act-btn edit-btn" onclick="editActive(${p.id})" title="Edit">✎</button>
         <button class="act-btn" onclick="deleteActive(${p.id})" title="Remove">✕</button>
@@ -586,11 +582,10 @@ function renderActive() {
     `;
     tbody.appendChild(tr);
   });
-  document.getElementById('totInvoiced').textContent  = fmt(tInv);
-  document.getElementById('totWip').textContent       = fmt(tWip);
-  document.getElementById('totBacklog').textContent   = fmt(tBack);
-  document.getElementById('totContracted').textContent= fmt(tInv+tWip+tBack);
-  document.getElementById('activeCount').textContent  = state.active.length;
+  document.getElementById('totContracted').textContent = fmt(tContract);
+  document.getElementById('totInvoiced').textContent   = fmt(tInv);
+  document.getElementById('totRemaining').textContent  = fmt(tRemaining);
+  document.getElementById('activeCount').textContent   = state.active.length;
 }
 
 function renderProposals() {
@@ -625,8 +620,8 @@ function renderRunway() {
   document.getElementById('burnDisplay').textContent = burn ? fmt(burn) : '—';
   document.getElementById('cashDisplay').textContent = cash ? fmt(cash) : '—';
 
-  // active backlog = WIP + backlog (not yet invoiced)
-  const activeBacklog = state.active.reduce((s,p)=>(s+(p.wip||0)+(p.backlog||0)),0);
+  // active remaining = contract - invoiced
+  const activeBacklog = state.active.reduce((s,p)=>s + Math.max(0,(p.contract||0)-(p.invoiced||0)), 0);
   document.getElementById('activeBacklogDisplay').textContent = fmt(activeBacklog);
 
   // weighted proposals
@@ -681,7 +676,7 @@ function saveCash() {
 let _editActiveId = null;
 function openAddActive() {
   _editActiveId = null;
-  ['aName','aInvoiced','aWip','aBacklog'].forEach(id => document.getElementById(id).value='');
+  ['aName','aContract','aInvoiced'].forEach(id => document.getElementById(id).value='');
   document.getElementById('addActiveModal').querySelector('h3').textContent = 'Add Active Project';
   document.getElementById('addActiveModal').classList.add('open');
   setTimeout(()=>document.getElementById('aName').focus(),50);
@@ -691,9 +686,8 @@ function editActive(id) {
   if (!p) return;
   _editActiveId = id;
   document.getElementById('aName').value     = p.name;
+  document.getElementById('aContract').value = p.contract||'';
   document.getElementById('aInvoiced').value = p.invoiced||'';
-  document.getElementById('aWip').value      = p.wip||'';
-  document.getElementById('aBacklog').value  = p.backlog||'';
   document.getElementById('addActiveModal').querySelector('h3').textContent = 'Edit Active Project';
   document.getElementById('addActiveModal').classList.add('open');
   setTimeout(()=>document.getElementById('aName').focus(),50);
@@ -704,9 +698,8 @@ function saveActiveProject() {
   if (!name) { document.getElementById('aName').focus(); return; }
   const data = {
     name,
+    contract: parseFloat(document.getElementById('aContract').value)||0,
     invoiced: parseFloat(document.getElementById('aInvoiced').value)||0,
-    wip:      parseFloat(document.getElementById('aWip').value)||0,
-    backlog:  parseFloat(document.getElementById('aBacklog').value)||0
   };
   if (_editActiveId !== null) {
     const idx = state.active.findIndex(x=>x.id===_editActiveId);
