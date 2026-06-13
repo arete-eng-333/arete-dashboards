@@ -21,6 +21,18 @@
       "name": "MER Purifier",
       "amount": 32500,
       "prob": 50
+    },
+    {
+      "id": 4,
+      "name": "MER CFD",
+      "amount": 8225,
+      "prob": 50
+    },
+    {
+      "id": 5,
+      "name": "SAS RCS",
+      "amount": 956500,
+      "prob": 20
     }
   ],
   "cashOnHand": 1000000
