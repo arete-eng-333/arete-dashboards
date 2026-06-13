@@ -1,5 +1,5 @@
 {
-  "monthlyBurn": 0,
+  "monthlyBurn": 110000,
   "active": [
     {
       "id": 1,
@@ -38,6 +38,18 @@
       "id": 6,
       "name": "SAS ICPMS PH6",
       "amount": 12000,
+      "prob": 50
+    },
+    {
+      "id": 7,
+      "name": "SAS WTE Ph2 IFC+CA",
+      "amount": 41720,
+      "prob": 75
+    },
+    {
+      "id": 8,
+      "name": "SAS Fire Water Pump Diesel Generator",
+      "amount": 13300,
       "prob": 50
     }
   ],
