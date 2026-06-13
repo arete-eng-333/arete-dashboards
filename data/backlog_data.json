@@ -15,6 +15,12 @@
       "name": "SAS ERT Building",
       "amount": 59200,
       "prob": 50
+    },
+    {
+      "id": 3,
+      "name": "MER Purifier",
+      "amount": 32500,
+      "prob": 50
     }
   ],
   "cashOnHand": 1000000
