@@ -91,7 +91,7 @@
       "id": 11,
       "name": "SAS CAPA Case 77",
       "amount": 51700,
-      "prob": 50
+      "prob": 100
     },
     {
       "id": 12,
@@ -118,5 +118,6 @@
       "prob": 50
     }
   ],
-  "cashOnHand": 1300000
+  "cashOnHand": 1300000,
+  "cashIncluded": false
 }
