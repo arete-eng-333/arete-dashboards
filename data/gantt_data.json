@@ -125,8 +125,8 @@
       "name": "26302-SAS F2 Slurry - 90% (F226-CH01)",
       "assignee": "Alex",
       "start": "2026-05-04",
-      "end": "2026-06-26",
-      "status": "onhold"
+      "end": "2026-06-25",
+      "status": "ontrack"
     },
     {
       "id": 28,
@@ -138,5 +138,5 @@
     }
   ],
   "nextId": 29,
-  "updatedAt": "2026-06-17T15:22:11.848Z"
+  "updatedAt": "2026-06-17T15:22:22.637Z"
 }
