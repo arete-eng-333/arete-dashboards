@@ -95,7 +95,7 @@
     },
     {
       "id": 12,
-      "name": "CPI",
+      "name": "CPI TAMU",
       "amount": 1206500,
       "prob": 35
     },
@@ -116,6 +116,12 @@
       "name": "MR2 Gowning Rm",
       "amount": 10900,
       "prob": 50
+    },
+    {
+      "id": 20,
+      "name": "MR2 Showers",
+      "amount": 49500,
+      "prob": 75
     }
   ],
   "cashOnHand": 1300000,
