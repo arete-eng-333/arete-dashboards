@@ -122,7 +122,7 @@
     },
     {
       "id": 25,
-      "name": "26302-SAS F2 Slurry - 90% (F226-CH01)",
+      "name": "26302-SAS F2 Slurry - IFC (F226-CH01)",
       "assignee": "Luke",
       "start": "2026-05-04",
       "end": "2026-06-25",
@@ -138,5 +138,5 @@
     }
   ],
   "nextId": 29,
-  "updatedAt": "2026-06-18T18:25:16.399Z"
+  "updatedAt": "2026-06-18T18:26:16.795Z"
 }
