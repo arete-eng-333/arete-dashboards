@@ -122,6 +122,12 @@
       "name": "MR2 Showers",
       "amount": 49500,
       "prob": 75
+    },
+    {
+      "id": 21,
+      "name": "Tekscend Office",
+      "amount": 7500,
+      "prob": 75
     }
   ],
   "cashOnHand": 1300000,
